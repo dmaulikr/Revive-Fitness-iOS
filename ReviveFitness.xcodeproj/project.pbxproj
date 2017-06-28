@@ -13,6 +13,7 @@
 		B66633961F0337A100AD5966 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B66633951F0337A100AD5966 /* Assets.xcassets */; };
 		B66633991F0337A100AD5966 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B66633971F0337A100AD5966 /* LaunchScreen.storyboard */; };
 		B66633A11F034C5500AD5966 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B66633A01F034C5500AD5966 /* GoogleService-Info.plist */; };
+		B66633A31F0356D400AD5966 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66633A21F0356D300AD5966 /* User.swift */; };
 		C1825EC38A3700232B8CF691 /* Pods_ReviveFitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 		B66633981F0337A100AD5966 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B666339A1F0337A100AD5966 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B66633A01F034C5500AD5966 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B66633A21F0356D300AD5966 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		EA470CA725A65E58DA65E5D5 /* Pods-ReviveFitness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.release.xcconfig"; sourceTree = "<group>"; };
 		EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReviveFitness.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -65,6 +67,7 @@
 			children = (
 				B666338E1F0337A100AD5966 /* AppDelegate.swift */,
 				B66633901F0337A100AD5966 /* LoginViewController.swift */,
+				B66633A21F0356D300AD5966 /* User.swift */,
 				B66633921F0337A100AD5966 /* Main.storyboard */,
 				B66633951F0337A100AD5966 /* Assets.xcassets */,
 				B66633971F0337A100AD5966 /* LaunchScreen.storyboard */,
@@ -218,6 +221,7 @@
 			files = (
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
 				B666338F1F0337A100AD5966 /* AppDelegate.swift in Sources */,
+				B66633A31F0356D400AD5966 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +387,7 @@
 				B666339F1F0337A100AD5966 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
