@@ -12,9 +12,12 @@
 		B66633941F0337A100AD5966 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B66633921F0337A100AD5966 /* Main.storyboard */; };
 		B66633961F0337A100AD5966 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B66633951F0337A100AD5966 /* Assets.xcassets */; };
 		B66633991F0337A100AD5966 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B66633971F0337A100AD5966 /* LaunchScreen.storyboard */; };
+		B66633A11F034C5500AD5966 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B66633A01F034C5500AD5966 /* GoogleService-Info.plist */; };
+		C1825EC38A3700232B8CF691 /* Pods_ReviveFitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		71F1FA24943EB98F72C31F72 /* Pods-ReviveFitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.debug.xcconfig"; sourceTree = "<group>"; };
 		B666338B1F0337A100AD5966 /* ReviveFitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReviveFitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B666338E1F0337A100AD5966 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B66633901F0337A100AD5966 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -22,6 +25,9 @@
 		B66633951F0337A100AD5966 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B66633981F0337A100AD5966 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B666339A1F0337A100AD5966 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B66633A01F034C5500AD5966 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		EA470CA725A65E58DA65E5D5 /* Pods-ReviveFitness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.release.xcconfig"; sourceTree = "<group>"; };
+		EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReviveFitness.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1825EC38A3700232B8CF691 /* Pods_ReviveFitness.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +47,8 @@
 			children = (
 				B666338D1F0337A100AD5966 /* ReviveFitness */,
 				B666338C1F0337A100AD5966 /* Products */,
+				DB4B522BF7485963EB8E7F7C /* Pods */,
+				BD3284F9B062266AFBA50D98 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,8 +69,26 @@
 				B66633951F0337A100AD5966 /* Assets.xcassets */,
 				B66633971F0337A100AD5966 /* LaunchScreen.storyboard */,
 				B666339A1F0337A100AD5966 /* Info.plist */,
+				B66633A01F034C5500AD5966 /* GoogleService-Info.plist */,
 			);
 			path = ReviveFitness;
+			sourceTree = "<group>";
+		};
+		BD3284F9B062266AFBA50D98 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DB4B522BF7485963EB8E7F7C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				71F1FA24943EB98F72C31F72 /* Pods-ReviveFitness.debug.xcconfig */,
+				EA470CA725A65E58DA65E5D5 /* Pods-ReviveFitness.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +98,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B666339D1F0337A100AD5966 /* Build configuration list for PBXNativeTarget "ReviveFitness" */;
 			buildPhases = (
+				349A20AD404B598E1CA40C07 /* [CP] Check Pods Manifest.lock */,
 				B66633871F0337A100AD5966 /* Sources */,
 				B66633881F0337A100AD5966 /* Frameworks */,
 				B66633891F0337A100AD5966 /* Resources */,
+				B4C943F433E140F2B56D4A43 /* [CP] Embed Pods Frameworks */,
+				F41F9392A51F2D9BB435C6C7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -125,12 +155,61 @@
 			buildActionMask = 2147483647;
 			files = (
 				B66633991F0337A100AD5966 /* LaunchScreen.storyboard in Resources */,
+				B66633A11F034C5500AD5966 /* GoogleService-Info.plist in Resources */,
 				B66633961F0337A100AD5966 /* Assets.xcassets in Resources */,
 				B66633941F0337A100AD5966 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		349A20AD404B598E1CA40C07 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B4C943F433E140F2B56D4A43 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F41F9392A51F2D9BB435C6C7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B66633871F0337A100AD5966 /* Sources */ = {
@@ -259,6 +338,7 @@
 		};
 		B666339E1F0337A100AD5966 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 71F1FA24943EB98F72C31F72 /* Pods-ReviveFitness.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 374VQ98E23;
@@ -272,6 +352,7 @@
 		};
 		B666339F1F0337A100AD5966 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA470CA725A65E58DA65E5D5 /* Pods-ReviveFitness.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 374VQ98E23;
