@@ -57,17 +57,17 @@ class Report: NSObject {
     
     func toAnyObject() -> Dictionary<String, String> {
         let dict = [
-            "sleep": "\(self.sleep)",
-            "water": "\(self.sleep)",
-            "oldHabit": "\(self.sleep)",
-            "newHabit": "\(self.sleep)",
-            "communication": "\(self.sleep)",
-            "scale": "\(self.sleep)",
-            "score": "\(self.sleep)",
-            "meals": "\(self.sleep)",
-            "snacks": "\(self.sleep)",
-            "workoutType": "\(self.sleep)",
-            "submissionDay": "\(self.submissionDay)"
+            "sleep": self.sleep.toString()!,
+            "water": self.water.toString()!,
+            "oldHabit": self.oldHabit.toString()!,
+            "newHabit": self.newHabit.toString()!,
+            "communication": self.communication.toString()!,
+            "scale": self.scale.toString()!,
+            "score": "\(self.score!)",
+            "meals": "\(self.meals!)",
+            "snacks": "\(self.snacks!)",
+            "workoutType": "\(self.workoutType!)",
+            "submissionDay": "\(self.submissionDay!)"
         ]
         return dict
     }
@@ -83,6 +83,17 @@ extension String {
             return false
         default:
             return nil
+        }
+    }
+}
+
+extension Bool {
+    func toString() -> String? {
+        switch self {
+        case true:
+            return "true"
+        case false:
+            return "false"
         }
     }
 }

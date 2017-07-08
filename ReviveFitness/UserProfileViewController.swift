@@ -8,8 +8,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     var databaseRef: DatabaseReference!
     var activeUser: User?
     var reportForToday: Report?
+    var reportToView: Report?
     
-    var reports: [Report?] = [Report?]()
+    var reports: [Report?] = [Report]()
     
     @IBOutlet weak var weekdayTableView: UITableView!
     
@@ -19,22 +20,38 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         weekdayTableView.delegate = self
         weekdayTableView.dataSource = self
         
-        //loadReportData()
+        // TEST REPORT CREATION
+        /*
+        for i in 1...6 {
+            let report = Report(meals: 2, snacks: 2, workoutType: 1, sleep: true, water: true, oldHabit: true, newHabit: false, communication: true, scale: true, score: 700 + i)
+            report.userId = activeUser?.id
+            let newReportRef = self.databaseRef.child("reports").child(report.userId!).child("Day\(i)")
+            newReportRef.setValue(report.toAnyObject())
+        }*/
+        
+        databaseRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                self.reports = self.updateReportData(with: snapshot)
+            }
+            self.weekdayTableView.reloadData()
+        })
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         nameLabel.text = activeUser?.firstName
+        updateUIElements()
     }
     
     // UI Functions
     
     func updateUIElements() {
+        updateTableCells()
         updateLabels()
         updateTableCells()
     }
@@ -64,6 +81,15 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
             if let report = reportForToday {
                 controller.reportToEdit = report
             }
+        } else if segue.identifier == "ViewDayReport" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! ReportTableViewController
+            controller.delegate = self
+            
+            if let _ = reportToView {
+                controller.reportToEdit = reportToView
+                controller.isReportViewOnly = true
+            }
         }
     }
     
@@ -71,13 +97,28 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        if indexPath.section == 0 {
+            performSegue(withIdentifier: "CurrentDayReport", sender: self)
+        } else {
+            if reportForToday != nil {
+                reportToView = reports[indexPath.row + 1]
+            } else {
+                reportToView = reports[indexPath.row]
+            }
+            performSegue(withIdentifier: "ViewDayReport", sender: self)
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
         } else if section == 1 {
-            return reports.count
+            if let _ = reportForToday {
+                return reports.count - 1
+            } else {
+                return reports.count
+            }
         } else {
             return 0
         }
@@ -99,27 +140,26 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DayCell")
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "ee" // Produces int corresponding to day (0 = monday, 1 = tuesday...)
-        let dayNumberToday = Int(dateFormatter.string(from: Date()))
         
         if indexPath.section == 0 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "EEEE"
             cell?.textLabel?.text = dateFormatter.string(from: Date())
             cell?.accessoryType = .disclosureIndicator
-            if reports[dayNumberToday!] != nil {
+            if let _ = reportForToday {
                 let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = ""
+                disclosureLabel.text = "Edit"
             } else {
                 let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = "Add Report"
+                disclosureLabel.text = "Add"
             }
         } else if indexPath.section == 1 {
-            let dayIndexForCell = dayNumberToday! + indexPath.row + 1
-            if reports[dayIndexForCell] != nil {
+            var dayIndexForCell = indexPath.row
+            if let _ = reportForToday { dayIndexForCell += 1 }
+            if reports.endIndex > dayIndexForCell {
                 let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = ""
+                cell?.textLabel?.text = getDay(for: (reports[dayIndexForCell]?.submissionDay)!)
+                disclosureLabel.text = "View"
                 cell?.accessoryType = .disclosureIndicator
             } else {
                 let disclosureLabel = cell?.viewWithTag(400) as! UILabel
@@ -134,7 +174,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     // ReportTableVC Delegate Methods
     
     func reportTableViewControllerDidCancel(_ controller: ReportTableViewController) {
-        print("Do nothing?")
         dismiss(animated: true, completion: nil)
     }
     
@@ -150,26 +189,64 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     
     // Firebase Report Data
     
-    func loadReportData(from snapshot: DataSnapshot) -> [Report] {
+    func updateReportData(with snapshot: DataSnapshot) -> [Report] {
         var newReports = [Report]()
         
-        if let reportsSnapshot = snapshot.value(forKey: "reports") as? DataSnapshot {
-            if let usersReportsSnapshot = reportsSnapshot.value(forKey: (activeUser?.id)!) as? DataSnapshot {
-                if let userDict = usersReportsSnapshot.value as? [String : NSDictionary] {
-                    for eachDay in userDict {
-                        let dayDict = userDict[eachDay.key]!
-                        let newReport = Report(of: dayDict as! Dictionary<String, String>)
-                        newReports[newReport.submissionDay] = newReport
+        if let snapshotDict = snapshot.value as? [String : NSDictionary] {
+            if let reportsDict = snapshotDict["reports"] as? [String : NSDictionary] {
+                for eachUserId in reportsDict {
+                    if let user = activeUser {
+                        if eachUserId.key == user.id {
+                            if let usersReportsDict = reportsDict[eachUserId.key] as? [String : NSDictionary] {
+                                for eachReport in usersReportsDict {
+                                    let reportDict = usersReportsDict[eachReport.key]!
+                                    let newReport = Report(of: reportDict as! Dictionary<String, String>)
+                                    newReports.append(newReport)
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        }
+        
+        newReports = newReports.sorted(by: { $0.submissionDay > $1.submissionDay })
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "ee" // Produces int corresponding to day (0 = monday, 1 = tuesday...)
+        let dayNumberToday = Int(dateFormatter.string(from: Date()))
+        if newReports.count > 0 {
+            if dayNumberToday! == newReports[0].submissionDay {
+                reportForToday = newReports[0]
             }
         }
         return newReports
     }
     
     func saveReport(_ report: Report) {
-        let newReportRef = self.databaseRef.child("reports").child(report.userId!).child("\(report.submissionDay)")
+        let newReportRef = self.databaseRef.child("reports").child(report.userId!).child("Day\(report.submissionDay!)")
         newReportRef.setValue(report.toAnyObject())
+    }
+    
+    func getDay(for number: Int) -> String {
+        switch number {
+        case 1:
+            return "Sunday"
+        case 2:
+            return "Monday"
+        case 3:
+            return "Tuesday"
+        case 4:
+            return "Wednesday"
+        case 5:
+            return "Thursday"
+        case 6:
+            return "Friday"
+        case 7:
+            return "Saturday"
+        default:
+            return "None"
+        }
     }
     
 }

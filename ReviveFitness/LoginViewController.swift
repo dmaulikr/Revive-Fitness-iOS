@@ -35,7 +35,7 @@ class LoginViewController: UIViewController {
         // Observe any changes in the database
         databaseRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
-                self.users = self.loadUsers(withSnapshot: snapshot)
+                self.users = self.loadUsers(with: snapshot)
             }
         })
         self.view.addGestureRecognizer(tapGestureRecognizer)
@@ -105,7 +105,7 @@ class LoginViewController: UIViewController {
         return false
     }
     
-    func loadUsers(withSnapshot snapshot: DataSnapshot) -> [User] {
+    func loadUsers(with snapshot: DataSnapshot) -> [User] {
         
         var loadedUsers = [User]()
         

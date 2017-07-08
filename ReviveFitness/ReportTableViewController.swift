@@ -93,6 +93,10 @@ class ReportTableViewController: UITableViewController {
         updateLabels()
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func updatePointsScore() {
         pointsScore = 0
         
