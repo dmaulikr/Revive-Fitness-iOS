@@ -85,6 +85,7 @@ class LoginViewController: UIViewController {
     func login() {
         if attemptLogin() {
             if isProfileComplete() {
+                setUserData(of: authenticatedUser!)
                 performSegue(withIdentifier: "UserProfile", sender: self)
             } else {
                 performSegue(withIdentifier: "CompleteProfile", sender: self)
@@ -149,6 +150,22 @@ class LoginViewController: UIViewController {
             }
         }
         return loadedUsers
+    }
+    
+    func setUserData(of user: User) {
+        let userDataRef = databaseRef.child("userData").child(authenticatedUser!.id)
+        userDataRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                if let userDataDict = snapshot.value as? [String : String] {
+                    self.authenticatedUser!.age = userDataDict["age"]
+                    self.authenticatedUser!.phone = userDataDict["phone"]
+                    self.authenticatedUser!.startWeight = userDataDict["startWeight"]
+                    self.authenticatedUser!.oldHabit = userDataDict["oldHabit"]
+                    self.authenticatedUser!.newHabit = userDataDict["newHabit"]
+                    self.authenticatedUser!.fitnessGoal = userDataDict["fitnessGoal"]
+                }
+            }
+        })
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

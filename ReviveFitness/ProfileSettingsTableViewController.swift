@@ -52,7 +52,13 @@ class ProfileSettingsTableViewController: UITableViewController {
     }
     
     func save() {
-        performSegue(withIdentifier: "SaveProfile", sender: self)
+        if fieldsFilled() {
+            saveChangesToFirebase()
+            updateUserInstance()
+            performSegue(withIdentifier: "SaveProfile", sender: self)
+        } else {
+            displayError()
+        }
     }
     
     func enableFirstTimeFields() {
@@ -77,6 +83,49 @@ class ProfileSettingsTableViewController: UITableViewController {
         oldHabitTextField.text = activeUser.oldHabit
         newHabitTextField.text = activeUser.newHabit
         fitnessGoalTextField.text = activeUser.fitnessGoal
+    }
+    
+    func fieldsFilled() -> Bool {
+        return (firstNameTextField.hasText && lastNameTextField.hasText &&
+        emailTextField.hasText && passwordTextField.hasText &&
+        phoneTextField.hasText && ageTextField.hasText &&
+        oldHabitTextField.hasText && newHabitTextField.hasText &&
+        fitnessGoalTextField.hasText)
+    }
+    
+    func saveChangesToFirebase() {
+        let updateUserProfileRef = self.databaseRef.child("users").child(activeUser.id)
+        let updateUserDataRef = self.databaseRef.child("userData").child(activeUser.id)
+        updateUserProfileRef.setValue(["name-first": firstNameTextField.text,
+                                       "name-last": lastNameTextField.text,
+                                       "email": emailTextField.text,
+                                       "password": passwordTextField.text,
+                                       "id": activeUser.id])
+        updateUserDataRef.setValue(["phone": phoneTextField.text,
+                                    "age": ageTextField.text,
+                                    "startWeight": startingWeightTextField.text,
+                                    "startBodyFat": bodyFatTextField.text,
+                                    "oldHabit": oldHabitTextField.text,
+                                    "newHabit": newHabitTextField.text,
+                                    "fitnessGoal": fitnessGoalTextField.text])
+    }
+    
+    func updateUserInstance() {
+        activeUser.firstName = firstNameTextField.text
+        activeUser.lastName = lastNameTextField.text
+        activeUser.email = emailTextField.text
+        activeUser.password = passwordTextField.text
+        activeUser.age = ageTextField.text
+        activeUser.phone = phoneTextField.text
+        activeUser.startWeight = startingWeightTextField.text
+        activeUser.startBodyFat = bodyFatTextField.text
+        activeUser.oldHabit = oldHabitTextField.text
+        activeUser.newHabit = newHabitTextField.text
+        activeUser.fitnessGoal = fitnessGoalTextField.text
+    }
+    
+    func displayError() {
+        print("Error")
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
