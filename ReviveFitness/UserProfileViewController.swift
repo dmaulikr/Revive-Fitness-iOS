@@ -18,6 +18,10 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var reportButton: UIButton!
     
+    @IBAction func settingsButtonTapped() {
+        performSegue(withIdentifier: "EditProfile", sender: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -90,6 +94,11 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
                 controller.reportToEdit = reportToView
                 controller.isReportViewOnly = true
             }
+        } else if segue.identifier == "EditProfile" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! ProfileSettingsTableViewController
+            controller.activeUser = self.activeUser
+            controller.databaseRef = self.databaseRef
         }
     }
     

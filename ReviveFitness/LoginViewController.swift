@@ -6,6 +6,7 @@ class LoginViewController: UIViewController {
     
     var databaseRef: DatabaseReference!
     var users = [User]()
+    var userData: [String : NSDictionary]?
     var authenticatedUser: User?
     
     @IBOutlet weak var emailTextField: UITextField!
@@ -26,7 +27,7 @@ class LoginViewController: UIViewController {
         /*
         let newUserRef = self.databaseRef.child("users").childByAutoId()
         let newUserID = newUserRef.key
-        newUserRef.setValue(["name-first": "Dominic", "name-last": "Holmes", "email": "developer.dominicholmes@gmail.com", "password": "admin1", "id": newUserID])
+        newUserRef.setValue(["name-first": "Dominic", "name-last": "Holmes", "email": "dominicholmes.dev@gmail.com", "password": "admin1", "id": newUserID])
         let newUserRef2 = self.databaseRef.child("users").childByAutoId()
         let newUserID2 = newUserRef2.key
         newUserRef2.setValue(["name-first": "Dominic", "name-last": "Holmes", "email": "dh506605@gmail.com", "password": "user1", "id": newUserID2])
@@ -83,7 +84,11 @@ class LoginViewController: UIViewController {
     
     func login() {
         if attemptLogin() {
-            performSegue(withIdentifier: "UserProfile", sender: self)
+            if isProfileComplete() {
+                performSegue(withIdentifier: "UserProfile", sender: self)
+            } else {
+                performSegue(withIdentifier: "CompleteProfile", sender: self)
+            }
         }
     }
     
@@ -105,6 +110,18 @@ class LoginViewController: UIViewController {
         return false
     }
     
+    func isProfileComplete() -> Bool {
+        let id = authenticatedUser?.id
+        if let keys = userData?.keys {
+            for eachKey in keys {
+                if eachKey == id {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
     func loadUsers(with snapshot: DataSnapshot) -> [User] {
         
         var loadedUsers = [User]()
@@ -114,7 +131,7 @@ class LoginViewController: UIViewController {
                 for eachUserId in usersDict {
                     let userDict = usersDict[eachUserId.key]!
                     let fname = userDict["name-first"] as? String
-                    let lname = userDict["name-first"] as? String
+                    let lname = userDict["name-last"] as? String
                     let email = userDict["email"] as? String
                     let password = userDict["password"] as? String
                     let id = userDict["id"] as? String
@@ -126,6 +143,10 @@ class LoginViewController: UIViewController {
                     }
                 }
             }
+            
+            if let usersDataDict = snapshotDict["userData"] as? [String : NSDictionary] {
+                userData = usersDataDict
+            }
         }
         return loadedUsers
     }
@@ -136,6 +157,12 @@ class LoginViewController: UIViewController {
             let controller = navigationController.topViewController as! UserProfileViewController
             controller.databaseRef = self.databaseRef
             controller.activeUser = self.authenticatedUser
+        } else if segue.identifier == "CompleteProfile" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! ProfileSettingsTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.authenticatedUser
+            controller.firstTimeSettings = true
         }
     }
     
