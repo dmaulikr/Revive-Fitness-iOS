@@ -10,7 +10,7 @@ class User: NSObject {
     let id: String!
     
     var phone: String?
-    var age: String?
+    var birthdate: String?
     var startWeight: String?
     var startBodyFat: String?
     var oldHabit: String?

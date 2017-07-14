@@ -10,7 +10,16 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     var reportForToday: Report?
     var reportToView: Report?
     
+    var weeklyReportAvailible = false
+    
     var reports: [Report?] = [Report]()
+    
+    var dayNumberToday: Int! {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
+        let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
+        return dayNumberToday!
+    }
     
     @IBOutlet weak var weekdayTableView: UITableView!
     
@@ -28,6 +37,10 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
         weekdayTableView.delegate = self
         weekdayTableView.dataSource = self
         
+        if dayNumberToday == 7 {
+            weeklyReportAvailible = true
+        }
+        
         // TEST REPORT CREATION
         /*
         for i in 1...6 {
@@ -42,6 +55,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
                 self.reports = self.updateReportData(with: snapshot)
             }
             self.weekdayTableView.reloadData()
+            self.updateUIElements()
         })
     }
     
@@ -55,7 +69,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     // UI Functions
     
     func updateUIElements() {
-        updateTableCells()
         updateLabels()
         updateTableCells()
     }
@@ -67,6 +80,10 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
         } else {
             reportButton.setTitle("Add Report", for: .normal)
             scoreLabel.text = "0 / 100"
+        }
+        
+        if weeklyReportAvailible {
+            reportButton.setTitle("Weekly Report", for: .normal)
         }
     }
     
@@ -134,7 +151,11 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        if reports.count > 0 {
+            return 2
+        } else {
+            return 1
+        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -223,7 +244,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (0 = monday, 1 = tuesday...)
-        let dayNumberToday = Int(dateFormatter.string(from: Date()))
+        let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
         if newReports.count > 0 {
             if dayNumberToday! == newReports[0].submissionDay {
                 reportForToday = newReports[0]
@@ -240,19 +261,19 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     func getDay(for number: Int) -> String {
         switch number {
         case 1:
-            return "Sunday"
-        case 2:
             return "Monday"
-        case 3:
+        case 2:
             return "Tuesday"
-        case 4:
+        case 3:
             return "Wednesday"
-        case 5:
+        case 4:
             return "Thursday"
-        case 6:
+        case 5:
             return "Friday"
-        case 7:
+        case 6:
             return "Saturday"
+        case 7:
+            return "Sunday"
         default:
             return "None"
         }

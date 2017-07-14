@@ -38,7 +38,7 @@ class Report: NSObject {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ee"
-        self.submissionDay = Int(dateFormatter.string(from: Date()))
+        self.submissionDay = Int(dateFormatter.string(from: Date()))?.convertDay()
     }
     
     init(of dict: Dictionary<String, String>) {
@@ -94,6 +94,16 @@ extension Bool {
             return "true"
         case false:
             return "false"
+        }
+    }
+}
+
+extension Int {
+    func convertDay() -> Int {
+        if self == 1 {
+            return 7
+        } else {
+            return self - 1
         }
     }
 }
