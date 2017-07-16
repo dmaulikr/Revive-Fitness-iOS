@@ -136,10 +136,11 @@ class LoginViewController: UIViewController {
                     let email = userDict["email"] as? String
                     let password = userDict["password"] as? String
                     let id = userDict["id"] as? String
+                    let weekNumber = userDict["week"] as? Int
                     if fname != nil && lname != nil && email != nil && password != nil {
                         let loadedUser = User(fname: fname!, lname: lname!,
                                              email: email!, password: password!,
-                                             id: id!)
+                                             id: id!, weekNumber: weekNumber!)
                         loadedUsers.append(loadedUser)
                     }
                 }

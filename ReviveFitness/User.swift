@@ -9,6 +9,8 @@ class User: NSObject {
     var password: String!
     let id: String!
     
+    var weekNumber: Int!
+    
     var phone: String?
     var birthdate: String?
     var startWeight: String?
@@ -17,11 +19,12 @@ class User: NSObject {
     var newHabit: String?
     var fitnessGoal: String?
     
-    init(fname: String, lname: String, email: String, password: String, id: String) {
+    init(fname: String, lname: String, email: String, password: String, id: String, weekNumber: Int) {
         self.firstName = fname
         self.lastName = lname
         self.email = email
         self.password = password
         self.id = id
+        self.weekNumber = weekNumber
     }
 }

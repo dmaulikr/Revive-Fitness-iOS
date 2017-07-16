@@ -3,7 +3,7 @@ import UIKit
 import Firebase
 
 class UserProfileViewController: UIViewController, UITableViewDataSource,
-UITableViewDelegate, ReportTableViewControllerDelegate {
+UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewControllerDelegate {
     
     var databaseRef: DatabaseReference!
     var activeUser: User?
@@ -11,6 +11,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     var reportToView: Report?
     
     var weeklyReportAvailible = false
+    var weeklyReportSubmitted = false
     
     var reports: [Report?] = [Report]()
     
@@ -26,6 +27,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var reportButton: UIButton!
+    @IBOutlet weak var weeklyReportButton: UIButton!
     
     @IBAction func settingsButtonTapped() {
         performSegue(withIdentifier: "EditProfile", sender: self)
@@ -82,8 +84,12 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
             scoreLabel.text = "0 / 100"
         }
         
+        if reportForToday != nil {
+            weeklyReportAvailible = true
+        }
+        
         if weeklyReportAvailible {
-            reportButton.setTitle("Weekly Report", for: .normal)
+            weeklyReportButton.isHidden = false
         }
     }
     
@@ -116,6 +122,11 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
             let controller = navigationController.topViewController as! ProfileSettingsTableViewController
             controller.activeUser = self.activeUser
             controller.databaseRef = self.databaseRef
+        } else if segue.identifier == "WeeklyReport" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! WeeklyReportTableViewController
+            controller.delegate = self
+            controller.reports = self.reports
         }
     }
     
@@ -217,6 +228,23 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
         updateUIElements()
     }
     
+    // WeeklyReportTableVC Delegate Methods
+    
+    func weeklyReportTableViewController(_ controller: WeeklyReportTableViewController,
+                                   didFinishWith report: WeeklyReport) {
+        dismiss(animated: true, completion: nil)
+        if let user = activeUser {
+            report.userId = user.id
+            report.weekId = user.weekNumber
+            saveWeeklyReport(report)
+        }
+        updateUIElements()
+    }
+    
+    func weeklyReportTableViewControllerDidCancel(_ controller: WeeklyReportTableViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
     // Firebase Report Data
     
     func updateReportData(with snapshot: DataSnapshot) -> [Report] {
@@ -254,8 +282,25 @@ UITableViewDelegate, ReportTableViewControllerDelegate {
     }
     
     func saveReport(_ report: Report) {
-        let newReportRef = self.databaseRef.child("reports").child(report.userId!).child("Day\(report.submissionDay!)")
+        let newReportRef =
+            self.databaseRef.child("reports").child(report.userId!).child("Day-\(report.submissionDay!)")
         newReportRef.setValue(report.toAnyObject())
+        
+        let oldReportRef =
+            self.databaseRef.child("oldReports").child(report.userId!).child("Week-\(activeUser!.weekNumber!)").child(report.date)
+        oldReportRef.setValue(report.toAnyObject())
+    }
+    
+    func saveWeeklyReport(_ weeklyReport: WeeklyReport) {
+        let weeklyReportRef = self.databaseRef.child("weeklyReports").child(weeklyReport.userId!).child("Week-\(weeklyReport.weekId!)")
+        weeklyReportRef.setValue(weeklyReport.toAnyObject())
+        
+        let userUpdateRef = self.databaseRef.child("users").child(activeUser!.id)
+        let weekNumberUpdate = ["week": activeUser!.weekNumber + 1  ]
+        userUpdateRef.updateChildValues(weekNumberUpdate)
+        
+        let tempReportsRef = self.databaseRef.child("reports").child(weeklyReport.userId!)
+        tempReportsRef.removeValue()
     }
     
     func getDay(for number: Int) -> String {

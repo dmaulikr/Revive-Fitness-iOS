@@ -97,11 +97,12 @@ class ProfileSettingsTableViewController: UITableViewController {
     func saveChangesToFirebase() {
         let updateUserProfileRef = self.databaseRef.child("users").child(activeUser.id)
         let updateUserDataRef = self.databaseRef.child("userData").child(activeUser.id)
-        updateUserProfileRef.setValue(["name-first": firstNameTextField.text,
-                                       "name-last": lastNameTextField.text,
-                                       "email": emailTextField.text,
-                                       "password": passwordTextField.text,
-                                       "id": activeUser.id])
+        updateUserProfileRef.setValue(["name-first": firstNameTextField.text!,
+                                       "name-last": lastNameTextField.text!,
+                                       "email": emailTextField.text!,
+                                       "password": passwordTextField.text!,
+                                       "id": activeUser.id,
+                                       "week": activeUser.weekNumber])
         updateUserDataRef.setValue(["phone": phoneTextField.text,
                                     "birth": birthdateLabel.text,
                                     "startWeight": startingWeightTextField.text,

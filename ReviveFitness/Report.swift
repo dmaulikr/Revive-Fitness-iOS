@@ -5,6 +5,7 @@ import FirebaseDatabase
 class Report: NSObject {
     
     let submissionDay: Int!
+    let date: String!
     
     let meals: Int! // 0 <= m <= 5
     let snacks: Int! // 0 <= s <= 5
@@ -36,9 +37,13 @@ class Report: NSObject {
         self.scale = scale
         self.score = score
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "ee"
-        self.submissionDay = Int(dateFormatter.string(from: Date()))?.convertDay()
+        let dateFormatterForSubmissionDay = DateFormatter()
+        dateFormatterForSubmissionDay.dateFormat = "ee"
+        self.submissionDay = Int(dateFormatterForSubmissionDay.string(from: Date()))?.convertDay()
+        
+        let dateFormatterForDate = DateFormatter()
+        dateFormatterForDate.dateFormat = "MM-dd-yyyy"
+        self.date = dateFormatterForDate.string(from: Date())
     }
     
     init(of dict: Dictionary<String, String>) {
@@ -48,6 +53,7 @@ class Report: NSObject {
         self.newHabit = dict["newHabit"]?.toBool()
         self.communication = dict["communication"]?.toBool()
         self.submissionDay = Int(dict["submissionDay"]!)
+        self.date = dict["date"]!
         self.scale = dict["scale"]?.toBool()
         self.snacks = Int(dict["snacks"]!)
         self.meals = Int(dict["meals"]!)
@@ -67,7 +73,8 @@ class Report: NSObject {
             "meals": "\(self.meals!)",
             "snacks": "\(self.snacks!)",
             "workoutType": "\(self.workoutType!)",
-            "submissionDay": "\(self.submissionDay!)"
+            "submissionDay": "\(self.submissionDay!)",
+            "date": "\(self.date!)"
         ]
         return dict
     }
