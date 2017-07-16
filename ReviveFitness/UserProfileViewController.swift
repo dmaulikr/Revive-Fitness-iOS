@@ -10,6 +10,8 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     var reportForToday: Report?
     var reportToView: Report?
     
+    var weeklyReport: WeeklyReport?
+    
     var weeklyReportAvailible = false
     var weeklyReportSubmitted = false
     
@@ -39,22 +41,13 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         weekdayTableView.delegate = self
         weekdayTableView.dataSource = self
         
-        if dayNumberToday == 7 {
-            weeklyReportAvailible = true
-        }
-        
-        // TEST REPORT CREATION
-        /*
-        for i in 1...6 {
-            let report = Report(meals: 2, snacks: 2, workoutType: 1, sleep: true, water: true, oldHabit: true, newHabit: false, communication: true, scale: true, score: 700 + i)
-            report.userId = activeUser?.id
-            let newReportRef = self.databaseRef.child("reports").child(report.userId!).child("Day\(i)")
-            newReportRef.setValue(report.toAnyObject())
-        }*/
+        checkForWeeklyReport()
         
         databaseRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
-                self.reports = self.updateReportData(with: snapshot)
+                if !self.weeklyReportSubmitted {
+                    self.reports = self.updateReportData(with: snapshot)
+                }
             }
             self.weekdayTableView.reloadData()
             self.updateUIElements()
@@ -66,6 +59,28 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         
         nameLabel.text = activeUser?.firstName
         updateUIElements()
+    }
+    
+    // Weekly Report
+    
+    func checkForWeeklyReport() {
+        if doesWeeklyReportExist() {
+            
+        }
+    }
+    
+    func doesWeeklyReportExist() -> Bool {
+        let weeklyReportRef = self.databaseRef.child("weeklyReports").child((activeUser?.id)!)
+        weeklyReportRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                if let weekDataDict = snapshot.value as? [String : String] {
+                    if weekDataDict.keys.contains("Week-\(self.activeUser!.weekNumber! - 1)") {
+                        
+                    }
+                }
+            }
+        })
+        return false
     }
     
     // UI Functions
@@ -82,14 +97,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         } else {
             reportButton.setTitle("Add Report", for: .normal)
             scoreLabel.text = "0 / 100"
-        }
-        
-        if reportForToday != nil {
-            weeklyReportAvailible = true
-        }
-        
-        if weeklyReportAvailible {
-            weeklyReportButton.isHidden = false
         }
     }
     
@@ -148,6 +155,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if weeklyReportSubmitted { return 1 }
+        
         if section == 0 {
             return 1
         } else if section == 1 {
@@ -162,6 +172,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
+        
+        if weeklyReportSubmitted { return 1 }
+        
         if reports.count > 0 {
             return 2
         } else {
@@ -171,7 +184,11 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
-            return "Today"
+            if weeklyReportSubmitted {
+                return "Weekly Report"
+            } else {
+                return "Today"
+            }
         } else if section == 1 {
             return "Earlier this week"
         } else {
@@ -181,8 +198,8 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DayCell")
-        
-        if indexPath.section == 0 {
+
+        if indexPath.section == 0 && !weeklyReportSubmitted {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "EEEE"
             cell?.textLabel?.text = dateFormatter.string(from: Date())
@@ -206,6 +223,13 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 let disclosureLabel = cell?.viewWithTag(400) as! UILabel
                 disclosureLabel.text = "No report"
                 cell?.accessoryType = .none
+            }
+        } else if indexPath.section == 0 && indexPath.row == 0 && weeklyReportSubmitted {
+            if let _ = weeklyReport {
+                let disclosureLabel = cell?.viewWithTag(400) as! UILabel
+                disclosureLabel.text = "View"
+                cell?.textLabel?.text = "Week \(weeklyReport!.weekId!) Report"
+                cell?.accessoryType = .disclosureIndicator
             }
         }
         
@@ -301,6 +325,10 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         
         let tempReportsRef = self.databaseRef.child("reports").child(weeklyReport.userId!)
         tempReportsRef.removeValue()
+        
+        weeklyReportAvailible = false
+        weeklyReportSubmitted = true
+        self.weeklyReport = weeklyReport
     }
     
     func getDay(for number: Int) -> String {
