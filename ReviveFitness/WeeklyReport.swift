@@ -21,7 +21,7 @@ class WeeklyReport: NSObject {
     }
     
     init(of dict: Dictionary<String, String>) {
-        self.weekScore = Int(dict["weekScore"]!)
+        self.weekScore = Int(dict["score"]!)
         self.date = dict["submissionDate"]!
     }
     

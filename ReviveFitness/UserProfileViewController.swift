@@ -24,6 +24,20 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         return dayNumberToday!
     }
     
+    var weekNumberToday: Int! {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "ww" // Produces int corresponding to week of year
+        let weekNumberToday = Int(dateFormatter.string(from: Date()))
+        return weekNumberToday!
+    }
+    
+    var currentYear: Int! {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy"
+        let currentYear = Int(dateFormatter.string(from: Date()))
+        return currentYear!
+    }
+    
     @IBOutlet weak var weekdayTableView: UITableView!
     
     @IBOutlet weak var nameLabel: UILabel!
@@ -41,17 +55,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         weekdayTableView.delegate = self
         weekdayTableView.dataSource = self
         
-        checkForWeeklyReport()
-        
-        databaseRef.observe(.value, with: { snapshot in
-            if let _ = snapshot.value {
-                if !self.weeklyReportSubmitted {
-                    self.reports = self.updateReportData(with: snapshot)
-                }
-            }
-            self.weekdayTableView.reloadData()
-            self.updateUIElements()
-        })
+        addFirebaseObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -61,25 +65,44 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         updateUIElements()
     }
     
-    // Weekly Report
-    
-    func checkForWeeklyReport() {
-        if doesWeeklyReportExist() {
+    func addFirebaseObservers() {
+        if let _ = activeUser {
+            let weeklyReportsRef = databaseRef.child("weeklyReports").child("Year-\(currentYear)").child("Week-\(weekNumberToday)")
+            let thisWeekUserReportRef = weeklyReportsRef.child(activeUser!.id)
+            thisWeekUserReportRef.observe(.value, with: { snapshot in
+                if let _ = snapshot.value {
+                    self.weeklyReport = self.loadWeeklyReportData(with: snapshot)
+                } else {
+                    self.weeklyReport = nil
+                }
+                self.weekdayTableView.reloadData()
+                self.updateUIElements()
+            })
             
+            let dailyReportsRef = databaseRef.child("reports").child("Year-\(currentYear)").child("Week-\(weekNumberToday)")
+            let usersDailyReportsForThisWeek = dailyReportsRef.child(activeUser!.id)
+            usersDailyReportsForThisWeek.observe(.value, with: { snapshot in
+                if let _ = snapshot.value {
+                    self.reports = self.loadDailyReportData(with: snapshot)
+                } else {
+                    self.reports = [Report]()
+                }
+                self.weekdayTableView.reloadData()
+                self.updateUIElements()
+            })
         }
     }
     
-    func doesWeeklyReportExist() -> Bool {
-        let weeklyReportRef = self.databaseRef.child("weeklyReports").child((activeUser?.id)!)
-        weeklyReportRef.observe(.value, with: { snapshot in
-            if let _ = snapshot.value {
-                if let weekDataDict = snapshot.value as? [String : String] {
-                    if weekDataDict.keys.contains("Week-\(self.activeUser!.weekNumber! - 1)") {
-                        
-                    }
+    // Weekly Report
+    
+    func isWeeklyReportAvailible() -> Bool {
+        if let _ = activeUser {
+            if activeUser?.weekNumber == weekNumberToday {
+                if dayNumberToday == 7 {
+                    return true
                 }
             }
-        })
+        }
         return false
     }
     
@@ -259,7 +282,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         dismiss(animated: true, completion: nil)
         if let user = activeUser {
             report.userId = user.id
-            report.weekId = user.weekNumber
+            report.weekId = weekNumberToday
             saveWeeklyReport(report)
         }
         updateUIElements()
@@ -271,64 +294,64 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     // Firebase Report Data
     
-    func updateReportData(with snapshot: DataSnapshot) -> [Report] {
+    func loadDailyReportData(with snapshot: DataSnapshot) -> [Report] {
         var newReports = [Report]()
         
-        if let snapshotDict = snapshot.value as? [String : NSDictionary] {
-            if let reportsDict = snapshotDict["reports"] as? [String : NSDictionary] {
-                for eachUserId in reportsDict {
-                    if let user = activeUser {
-                        if eachUserId.key == user.id {
-                            if let usersReportsDict = reportsDict[eachUserId.key] as? [String : NSDictionary] {
-                                for eachReport in usersReportsDict {
-                                    let reportDict = usersReportsDict[eachReport.key]!
-                                    let newReport = Report(of: reportDict as! Dictionary<String, String>)
-                                    newReports.append(newReport)
-                                }
-                            }
-                        }
-                    }
-                }
+        if let dailyReportsDict = snapshot.value as? [String : NSDictionary] {
+            for eachReport in dailyReportsDict {
+                let reportDict = dailyReportsDict[eachReport.key]!
+                let newReport = Report(of: reportDict as! Dictionary<String, String>)
+                newReports.append(newReport)
             }
         }
         
         newReports = newReports.sorted(by: { $0.submissionDay > $1.submissionDay })
-        
+        findReportForToday(from: newReports)
+        return newReports
+    }
+    
+    func loadWeeklyReportData(with snapshot: DataSnapshot) -> WeeklyReport? {
+        if let weekReportDict = snapshot.value as? [String: String] {
+            return WeeklyReport(of: weekReportDict)
+        } else {
+            return nil
+        }
+    }
+    
+    func findReportForToday(from newReports: [Report]) {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "ee" // Produces int corresponding to day (0 = monday, 1 = tuesday...)
+        dateFormatter.dateFormat = "ee"
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
         if newReports.count > 0 {
             if dayNumberToday! == newReports[0].submissionDay {
-                reportForToday = newReports[0]
+                self.reportForToday = newReports[0]
             }
         }
-        return newReports
     }
     
     func saveReport(_ report: Report) {
         let newReportRef =
-            self.databaseRef.child("reports").child(report.userId!).child("Day-\(report.submissionDay!)")
-        newReportRef.setValue(report.toAnyObject())
+            self.databaseRef.child("reports").child(
+                "Year-\(currentYear!)").child(
+                    "Week-\(weekNumberToday!)").child(
+                        activeUser!.id).child(
+                            "Day-\(report.submissionDay!)")
         
-        let oldReportRef =
-            self.databaseRef.child("oldReports").child(report.userId!).child("Week-\(activeUser!.weekNumber!)").child(report.date)
-        oldReportRef.setValue(report.toAnyObject())
+        newReportRef.setValue(report.toAnyObject())
     }
     
     func saveWeeklyReport(_ weeklyReport: WeeklyReport) {
-        let weeklyReportRef = self.databaseRef.child("weeklyReports").child(weeklyReport.userId!).child("Week-\(weeklyReport.weekId!)")
+        let weeklyReportRef = self.databaseRef.child(
+            "weeklyReports").child(
+                "Year-\(currentYear!)").child(
+                    "Week-\(weekNumberToday!)").child(
+                        weeklyReport.userId!)
+        
         weeklyReportRef.setValue(weeklyReport.toAnyObject())
         
         let userUpdateRef = self.databaseRef.child("users").child(activeUser!.id)
-        let weekNumberUpdate = ["week": activeUser!.weekNumber + 1  ]
+        let weekNumberUpdate = ["week": activeUser!.weekNumber + 1]
         userUpdateRef.updateChildValues(weekNumberUpdate)
-        
-        let tempReportsRef = self.databaseRef.child("reports").child(weeklyReport.userId!)
-        tempReportsRef.removeValue()
-        
-        weeklyReportAvailible = false
-        weeklyReportSubmitted = true
-        self.weeklyReport = weeklyReport
     }
     
     func getDay(for number: Int) -> String {
