@@ -18,10 +18,11 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     var reports: [Report?] = [Report]()
     
     var dayNumberToday: Int! {
-        let dateFormatter = DateFormatter()
+        /*let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
-        return dayNumberToday!
+        return dayNumberToday!*/
+        return 7 // ALWAYS SUNDAY (for testing purposes
     }
     
     var weekNumberToday: Int! {
@@ -63,28 +64,38 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         
         nameLabel.text = activeUser?.firstName
         updateUIElements()
+        
+        if let _ = weeklyReport {
+            print("~~~~WEEKLY REPORT LOADED")
+        } else {
+            print("~~~~WEEKLY REPORT NOT LOADED")
+        }
     }
     
     func addFirebaseObservers() {
         if let _ = activeUser {
-            let weeklyReportsRef = databaseRef.child("weeklyReports").child("Year-\(currentYear)").child("Week-\(weekNumberToday)")
+            let weeklyReportsRef =
+                databaseRef.child("weeklyReports").child("Year-\(currentYear!)").child("Week-\(weekNumberToday!)")
             let thisWeekUserReportRef = weeklyReportsRef.child(activeUser!.id)
             thisWeekUserReportRef.observe(.value, with: { snapshot in
                 if let _ = snapshot.value {
                     self.weeklyReport = self.loadWeeklyReportData(with: snapshot)
                 } else {
+                    print("~~~~SETTING WEEKLY REPORT TO NIL")
                     self.weeklyReport = nil
                 }
                 self.weekdayTableView.reloadData()
                 self.updateUIElements()
             })
             
-            let dailyReportsRef = databaseRef.child("reports").child("Year-\(currentYear)").child("Week-\(weekNumberToday)")
+            let dailyReportsRef =
+                databaseRef.child("reports").child("Year-\(currentYear!)").child("Week-\(weekNumberToday!)")
             let usersDailyReportsForThisWeek = dailyReportsRef.child(activeUser!.id)
             usersDailyReportsForThisWeek.observe(.value, with: { snapshot in
                 if let _ = snapshot.value {
                     self.reports = self.loadDailyReportData(with: snapshot)
                 } else {
+                    print("~~~~SETTING DAILY REPORTS TO NIL")
                     self.reports = [Report]()
                 }
                 self.weekdayTableView.reloadData()
@@ -97,12 +108,14 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     func isWeeklyReportAvailible() -> Bool {
         if let _ = activeUser {
-            if activeUser?.weekNumber == weekNumberToday {
+            if let _ = weeklyReport {
                 if dayNumberToday == 7 {
+                    weeklyReportAvailible = true
                     return true
                 }
             }
         }
+        weeklyReportAvailible = false
         return false
     }
     
@@ -111,6 +124,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     func updateUIElements() {
         updateLabels()
         updateTableCells()
+        updateWeeklyReportButton()
     }
     
     func updateLabels() {
@@ -120,6 +134,14 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         } else {
             reportButton.setTitle("Add Report", for: .normal)
             scoreLabel.text = "0 / 100"
+        }
+    }
+    
+    func updateWeeklyReportButton() {
+        if isWeeklyReportAvailible() {
+            weeklyReportButton.isHidden = false
+        } else {
+            weeklyReportButton.isHidden = true
         }
     }
     
@@ -178,13 +200,22 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        if weeklyReportSubmitted { return 1 }
-        
+        let weeklyReportCellVisible = weeklyReport != nil || weeklyReportAvailible
+        let reportForTodayExists = reportForToday != nil
         if section == 0 {
             return 1
         } else if section == 1 {
-            if let _ = reportForToday {
+            if weeklyReportCellVisible {
+                return 1
+            } else {
+                if reportForTodayExists {
+                    return reports.count - 1
+                } else {
+                    return reports.count
+                }
+            }
+        } else if section == 2 {
+            if reportForTodayExists {
                 return reports.count - 1
             } else {
                 return reports.count
@@ -195,25 +226,31 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        
-        if weeklyReportSubmitted { return 1 }
-        
-        if reports.count > 0 {
-            return 2
-        } else {
-            return 1
-        }
+        // Min: 1 (because "Today" cell is always visible), Max: 3
+        var numSections = 1
+        if let _ = weeklyReport { numSections += 1 }
+        if (reports.count > 0 && reportForToday == nil) ||
+            (reports.count > 1) { numSections += 1 }
+        return numSections
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        let weeklyReportCellVisible = weeklyReport != nil || weeklyReportAvailible
         if section == 0 {
-            if weeklyReportSubmitted {
-                return "Weekly Report"
+            if weeklyReportCellVisible {
+                return "This Week's Report"
             } else {
-                return "Today"
+                return "Today's Report"
             }
         } else if section == 1 {
-            return "Earlier this week"
+            if weeklyReportCellVisible {
+                return "Today's Report"
+            } else {
+                return "Earlier This Week"
+            }
+        } else if section == 2 {
+            return "Earlier This Week"
         } else {
             return ""
         }
@@ -221,38 +258,67 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DayCell")
-
-        if indexPath.section == 0 && !weeklyReportSubmitted {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "EEEE"
-            cell?.textLabel?.text = dateFormatter.string(from: Date())
-            cell?.accessoryType = .disclosureIndicator
-            if let _ = reportForToday {
-                let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = "Edit"
+        let weeklyReportCellVisible = (weeklyReport != nil) || weeklyReportAvailible
+        let reportForTodayExists = reportForToday != nil
+        let today = Date()
+        let disclosureLabel = cell?.viewWithTag(400) as! UILabel
+        
+        if indexPath.section == 0 {
+            if weeklyReportCellVisible {
+                let monthDateFormatter = DateFormatter()
+                monthDateFormatter.dateFormat = "MMMM" // Produces full month name (eg. "September")
+                let weekOfMonthDateFormatter = DateFormatter()
+                weekOfMonthDateFormatter.dateFormat = "W"
+                cell?.textLabel?.text =
+                    monthDateFormatter.string(from: today) + " - Week " + weekOfMonthDateFormatter.string(from: today)
+                if let _ = weeklyReport {
+                    disclosureLabel.text = "View"
+                } else {
+                    let disclosureLabel = cell?.viewWithTag(400) as! UILabel
+                    disclosureLabel.text = "Add"
+                }
             } else {
-                let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = "Add"
+                let todayDateFormatter = DateFormatter()
+                todayDateFormatter.dateFormat = "EEEE"
+                cell?.textLabel?.text = todayDateFormatter.string(from: today)
+                if reportForTodayExists {
+                    if let _ = weeklyReport {
+                        disclosureLabel.text = "View"
+                    } else {
+                        disclosureLabel.text = "Edit"
+                    }
+                } else {
+                    disclosureLabel.text = "Add"
+                }
             }
         } else if indexPath.section == 1 {
+            if weeklyReportCellVisible {
+                let todayDateFormatter = DateFormatter()
+                todayDateFormatter.dateFormat = "EEEE"
+                cell?.textLabel?.text = todayDateFormatter.string(from: today)
+                if reportForTodayExists {
+                    if let _ = weeklyReport {
+                        disclosureLabel.text = "View"
+                    } else {
+                        disclosureLabel.text = "Edit"
+                    }
+                } else {
+                    disclosureLabel.text = "Add"
+                }
+            } else {
+                var dayIndexForCell = indexPath.row
+                if reportForTodayExists { dayIndexForCell += 1 }
+                if reports.endIndex > dayIndexForCell {
+                    cell?.textLabel?.text = getDay(for: (reports[dayIndexForCell]?.submissionDay)!)
+                    disclosureLabel.text = "View"
+                }
+            }
+        } else if indexPath.section == 2 {
             var dayIndexForCell = indexPath.row
-            if let _ = reportForToday { dayIndexForCell += 1 }
+            if reportForTodayExists { dayIndexForCell += 1 }
             if reports.endIndex > dayIndexForCell {
-                let disclosureLabel = cell?.viewWithTag(400) as! UILabel
                 cell?.textLabel?.text = getDay(for: (reports[dayIndexForCell]?.submissionDay)!)
                 disclosureLabel.text = "View"
-                cell?.accessoryType = .disclosureIndicator
-            } else {
-                let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = "No report"
-                cell?.accessoryType = .none
-            }
-        } else if indexPath.section == 0 && indexPath.row == 0 && weeklyReportSubmitted {
-            if let _ = weeklyReport {
-                let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                disclosureLabel.text = "View"
-                cell?.textLabel?.text = "Week \(weeklyReport!.weekId!) Report"
-                cell?.accessoryType = .disclosureIndicator
             }
         }
         
