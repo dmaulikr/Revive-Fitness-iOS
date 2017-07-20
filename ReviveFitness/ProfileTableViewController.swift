@@ -2,8 +2,9 @@
 import UIKit
 import Firebase
 
-class UserProfileViewController: UIViewController, UITableViewDataSource,
-UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewControllerDelegate {
+class ProfileTableViewController: UITableViewController,
+ReportTableViewControllerDelegate, WeeklyReportTableViewControllerDelegate,
+ProfileSettingsTableViewControllerDelegate {
     
     var databaseRef: DatabaseReference!
     var activeUser: User?
@@ -16,6 +17,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     var weeklyReportSubmitted = false
     
     var reports: [Report?] = [Report]()
+    
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var weeklyReportButton: UIButton!
     
     @IBOutlet weak var goalRadialView: RadialProgressView!
     @IBOutlet weak var weekRadialView: RadialProgressView!
@@ -64,21 +68,12 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         return dayNumberToday * 100
     }
     
-    @IBOutlet weak var weekdayTableView: UITableView!
-    
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var reportButton: UIButton!
-    @IBOutlet weak var weeklyReportButton: UIButton!
-    
     @IBAction func settingsButtonTapped() {
         performSegue(withIdentifier: "EditProfile", sender: self)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        weekdayTableView.delegate = self
-        weekdayTableView.dataSource = self
         
         addFirebaseObservers()
         
@@ -113,7 +108,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 } else {
                     self.weeklyReport = nil
                 }
-                self.weekdayTableView.reloadData()
+                self.tableView.reloadData()
                 self.updateUIElements()
             })
             
@@ -126,7 +121,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 } else {
                     self.reports = [Report]()
                 }
-                self.weekdayTableView.reloadData()
+                self.tableView.reloadData()
                 self.updateUIElements()
             })
         }
@@ -151,20 +146,12 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     func updateUIElements() {
         updateLabels()
-        updateTableCells()
         updateWeeklyReportButton()
+        self.tableView.reloadData()
     }
     
     func updateLabels() {
-        
         nameLabel.text = "Welcome, \((activeUser?.firstName)!)"
-        
-        if let report = reportForToday {
-            reportButton.setTitle("Edit Report", for: .normal)
-        } else {
-            reportButton.setTitle("Add Report", for: .normal)
-        }
-        
         updateRadialLabels()
     }
     
@@ -191,10 +178,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         } else {
             weeklyReportButton.isHidden = true
         }
-    }
-    
-    func updateTableCells() {
-        weekdayTableView.reloadData()
     }
     
     func updateRadialViews() {
@@ -229,11 +212,12 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 controller.reportToEdit = reportToView
                 controller.isReportViewOnly = true
             }
-        } else if segue.identifier == "EditProfile" {
+        } else if segue.identifier == "ProfileSettings" {
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! ProfileSettingsTableViewController
             controller.activeUser = self.activeUser
             controller.databaseRef = self.databaseRef
+            controller.delegate = self
         } else if segue.identifier == "WeeklyReport" {
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! WeeklyReportTableViewController
@@ -242,9 +226,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         }
     }
     
-    // WeekdayTableVC Data Source & Delegate Methods
+    // TableVC Data Source & Delegate Methods
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 0 {
@@ -259,7 +243,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         }
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let weeklyReportCellVisible = weeklyReport != nil || weeklyReportAvailible
         let reportForTodayExists = reportForToday != nil
         if section == 0 {
@@ -285,7 +269,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         }
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // Min: 1 (because "Today" cell is always visible), Max: 3
         var numSections = 1
         if let _ = weeklyReport { numSections += 1 }
@@ -294,7 +278,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         return numSections
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
         let weeklyReportCellVisible = weeklyReport != nil || weeklyReportAvailible
         if section == 0 {
@@ -316,12 +300,12 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         }
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "DayCell")
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ReportCell")
         let weeklyReportCellVisible = (weeklyReport != nil) || weeklyReportAvailible
         let reportForTodayExists = reportForToday != nil
         let today = Date()
-        let disclosureLabel = cell?.viewWithTag(400) as! UILabel
+        let disclosureLabel = cell?.detailTextLabel
         
         if indexPath.section == 0 {
             if weeklyReportCellVisible {
@@ -332,10 +316,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 cell?.textLabel?.text =
                     monthDateFormatter.string(from: today) + " - Week " + weekOfMonthDateFormatter.string(from: today)
                 if let _ = weeklyReport {
-                    disclosureLabel.text = "View"
+                    disclosureLabel?.text = "View"
                 } else {
-                    let disclosureLabel = cell?.viewWithTag(400) as! UILabel
-                    disclosureLabel.text = "Add"
+                    disclosureLabel?.text = "Add"
                 }
             } else {
                 let todayDateFormatter = DateFormatter()
@@ -343,12 +326,12 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 cell?.textLabel?.text = todayDateFormatter.string(from: today)
                 if reportForTodayExists {
                     if let _ = weeklyReport {
-                        disclosureLabel.text = "View"
+                        disclosureLabel?.text = "View"
                     } else {
-                        disclosureLabel.text = "Edit"
+                        disclosureLabel?.text = "Edit"
                     }
                 } else {
-                    disclosureLabel.text = "Add"
+                    disclosureLabel?.text = "Add"
                 }
             }
         } else if indexPath.section == 1 {
@@ -358,19 +341,19 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 cell?.textLabel?.text = todayDateFormatter.string(from: today)
                 if reportForTodayExists {
                     if let _ = weeklyReport {
-                        disclosureLabel.text = "View"
+                        disclosureLabel?.text = "View"
                     } else {
-                        disclosureLabel.text = "Edit"
+                        disclosureLabel?.text = "Edit"
                     }
                 } else {
-                    disclosureLabel.text = "Add"
+                    disclosureLabel?.text = "Add"
                 }
             } else {
                 var dayIndexForCell = indexPath.row
                 if reportForTodayExists { dayIndexForCell += 1 }
                 if reports.endIndex > dayIndexForCell {
                     cell?.textLabel?.text = getDay(for: (reports[dayIndexForCell]?.submissionDay)!)
-                    disclosureLabel.text = "View"
+                    disclosureLabel?.text = "View"
                 }
             }
         } else if indexPath.section == 2 {
@@ -378,7 +361,7 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
             if reportForTodayExists { dayIndexForCell += 1 }
             if reports.endIndex > dayIndexForCell {
                 cell?.textLabel?.text = getDay(for: (reports[dayIndexForCell]?.submissionDay)!)
-                disclosureLabel.text = "View"
+                disclosureLabel?.text = "View"
             }
         }
         
@@ -415,6 +398,19 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     }
     
     func weeklyReportTableViewControllerDidCancel(_ controller: WeeklyReportTableViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // ProfileSettingsTableVC Delegate Methods
+    
+    func profileSettingsTableViewController(_ controller: ProfileSettingsTableViewController,
+                                            didFinishWith updatedUser: User) {
+        activeUser = updatedUser
+        updateUIElements()
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func profileSettingsTableViewControllerDidCancel(_ controller: ProfileSettingsTableViewController) {
         dismiss(animated: true, completion: nil)
     }
     

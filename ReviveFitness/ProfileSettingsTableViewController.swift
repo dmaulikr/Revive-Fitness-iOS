@@ -3,12 +3,20 @@ import UIKit
 import Foundation
 import FirebaseDatabase
 
+protocol ProfileSettingsTableViewControllerDelegate: class {
+    func profileSettingsTableViewControllerDidCancel(_ controller: ProfileSettingsTableViewController)
+    func profileSettingsTableViewController(_ controller: ProfileSettingsTableViewController,
+                                   didFinishWith updatedUser: User)
+}
+
 class ProfileSettingsTableViewController: UITableViewController {
     
     var firstTimeSettings = false
     
     var databaseRef: DatabaseReference!
+    
     var activeUser: User!
+    weak var delegate: ProfileSettingsTableViewControllerDelegate?
     
     var datePickerVisible = false
     
@@ -34,7 +42,7 @@ class ProfileSettingsTableViewController: UITableViewController {
     }
     
     @IBAction func cancelButton() {
-        dismiss(animated: true, completion: nil)
+        cancel()
     }
     
     override func viewDidLoad() {
@@ -55,9 +63,21 @@ class ProfileSettingsTableViewController: UITableViewController {
         if fieldsFilled() {
             saveChangesToFirebase()
             updateUserInstance()
-            performSegue(withIdentifier: "SaveProfile", sender: self)
+            if let _ = delegate {
+                delegate?.profileSettingsTableViewController(self, didFinishWith: activeUser)
+            } else {
+                dismiss(animated: true, completion: nil)
+            }
         } else {
             displayError()
+        }
+    }
+    
+    func cancel() {
+        if let _ = delegate {
+            delegate?.profileSettingsTableViewControllerDidCancel(self)
+        } else {
+            dismiss(animated: true, completion: nil)
         }
     }
     
@@ -146,6 +166,7 @@ class ProfileSettingsTableViewController: UITableViewController {
         } else if sender == lastNameTextField {
             phoneTextField.becomeFirstResponder()
         } else if sender == phoneTextField {
+            phoneTextField.resignFirstResponder()
             showDatePicker()
         } else if sender == startingWeightTextField {
             bodyFatTextField.becomeFirstResponder()
@@ -164,7 +185,7 @@ class ProfileSettingsTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "SaveProfile" {
             let navigationController = segue.destination as! UINavigationController
-            let controller = navigationController.topViewController as! UserProfileViewController
+            let controller = navigationController.topViewController as! ProfileTableViewController
             controller.databaseRef = self.databaseRef
             controller.activeUser = self.activeUser
         }

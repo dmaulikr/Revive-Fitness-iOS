@@ -71,9 +71,7 @@ class RadialProgressView: UIView {
         layer.addSublayer(progressCircleLayer)
     }
     
-    func setValueAnimated(
-        duration: TimeInterval,
-        newProgressValue: CGFloat) {
+    func setValueAnimated(duration: TimeInterval, newProgressValue: CGFloat) {
         // Animate the strokeEnd property of the progressCircleLayer
         let animation = CABasicAnimation(keyPath: "strokeEnd")
         animation.duration = duration

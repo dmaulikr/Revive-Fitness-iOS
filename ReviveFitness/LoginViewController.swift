@@ -161,6 +161,7 @@ class LoginViewController: UIViewController {
                     self.authenticatedUser!.birthdate = userDataDict["birth"]
                     self.authenticatedUser!.phone = userDataDict["phone"]
                     self.authenticatedUser!.startWeight = userDataDict["startWeight"]
+                    self.authenticatedUser!.startBodyFat = userDataDict["startBodyFat"]
                     self.authenticatedUser!.oldHabit = userDataDict["oldHabit"]
                     self.authenticatedUser!.newHabit = userDataDict["newHabit"]
                     self.authenticatedUser!.fitnessGoal = userDataDict["fitnessGoal"]
@@ -172,7 +173,7 @@ class LoginViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "UserProfile" {
             let navigationController = segue.destination as! UINavigationController
-            let controller = navigationController.topViewController as! UserProfileViewController
+            let controller = navigationController.topViewController as! ProfileTableViewController
             controller.databaseRef = self.databaseRef
             controller.activeUser = self.authenticatedUser
         } else if segue.identifier == "CompleteProfile" {
