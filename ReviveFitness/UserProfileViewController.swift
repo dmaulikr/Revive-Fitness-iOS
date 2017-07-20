@@ -67,7 +67,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     @IBOutlet weak var weekdayTableView: UITableView!
     
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var reportButton: UIButton!
     @IBOutlet weak var weeklyReportButton: UIButton!
     
@@ -162,10 +161,8 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         
         if let report = reportForToday {
             reportButton.setTitle("Edit Report", for: .normal)
-            scoreLabel.text = String(report.score) + " / 100"
         } else {
             reportButton.setTitle("Add Report", for: .normal)
-            scoreLabel.text = "0 / 100"
         }
         
         updateRadialLabels()
