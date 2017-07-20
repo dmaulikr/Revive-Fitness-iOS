@@ -17,12 +17,25 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     var reports: [Report?] = [Report]()
     
+    @IBOutlet weak var goalRadialView: RadialProgressView!
+    @IBOutlet weak var weekRadialView: RadialProgressView!
+    @IBOutlet weak var todayRadialView: RadialProgressView!
+    
+    @IBOutlet weak var goalTopLabel: UILabel!
+    @IBOutlet weak var goalBottomLabel: UILabel!
+    @IBOutlet weak var weekTopLabel: UILabel!
+    @IBOutlet weak var weekBottomLabel: UILabel!
+    @IBOutlet weak var todayTopLabel: UILabel!
+    @IBOutlet weak var todayBottomLabel: UILabel!
+    @IBOutlet weak var todayDividerView: UIView!
+    @IBOutlet weak var todayRadialAddReportButton: UIButton!
+    
     var dayNumberToday: Int! {
-        /*let dateFormatter = DateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
-        return dayNumberToday!*/
-        return 7 // ALWAYS SUNDAY (for testing purposes
+        return dayNumberToday!
+        //return 7 // ALWAYS SUNDAY (for testing purposes
     }
     
     var weekNumberToday: Int! {
@@ -37,6 +50,18 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         dateFormatter.dateFormat = "yyyy"
         let currentYear = Int(dateFormatter.string(from: Date()))
         return currentYear!
+    }
+    
+    var scoreThisWeek: Int! {
+        var tempScore = 0
+        for eachReport in reports {
+            tempScore += (eachReport?.score)!
+        }
+        return tempScore
+    }
+    
+    var potentialScoreThisWeek: Int! {
+        return dayNumberToday * 100
     }
     
     @IBOutlet weak var weekdayTableView: UITableView!
@@ -57,19 +82,25 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         weekdayTableView.dataSource = self
         
         addFirebaseObservers()
+        
+        goalRadialView.progressStroke = goalTopLabel.textColor
+        goalRadialView.createCircles()
+        weekRadialView.progressStroke = weekTopLabel.textColor
+        weekRadialView.createCircles()
+        todayRadialView.progressStroke = todayTopLabel.textColor
+        todayRadialView.createCircles()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        nameLabel.text = activeUser?.firstName
         updateUIElements()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        if let _ = weeklyReport {
-            print("~~~~WEEKLY REPORT LOADED")
-        } else {
-            print("~~~~WEEKLY REPORT NOT LOADED")
-        }
+        updateRadialViews()
     }
     
     func addFirebaseObservers() {
@@ -81,7 +112,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 if let _ = snapshot.value {
                     self.weeklyReport = self.loadWeeklyReportData(with: snapshot)
                 } else {
-                    print("~~~~SETTING WEEKLY REPORT TO NIL")
                     self.weeklyReport = nil
                 }
                 self.weekdayTableView.reloadData()
@@ -95,7 +125,6 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
                 if let _ = snapshot.value {
                     self.reports = self.loadDailyReportData(with: snapshot)
                 } else {
-                    print("~~~~SETTING DAILY REPORTS TO NIL")
                     self.reports = [Report]()
                 }
                 self.weekdayTableView.reloadData()
@@ -128,6 +157,9 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     }
     
     func updateLabels() {
+        
+        nameLabel.text = "Welcome, \((activeUser?.firstName)!)"
+        
         if let report = reportForToday {
             reportButton.setTitle("Edit Report", for: .normal)
             scoreLabel.text = String(report.score) + " / 100"
@@ -135,6 +167,25 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
             reportButton.setTitle("Add Report", for: .normal)
             scoreLabel.text = "0 / 100"
         }
+        
+        updateRadialLabels()
+    }
+    
+    func updateRadialLabels() {
+        if let rep = reportForToday {
+            todayTopLabel.text = ("\((rep.score)!)")
+            todayBottomLabel.text = "100 pts"
+            todayDividerView.isHidden = false
+            todayRadialAddReportButton.isHidden = true
+        } else {
+            todayTopLabel.text = ""
+            todayBottomLabel.text = ""
+            todayDividerView.isHidden = true
+            todayRadialAddReportButton.isHidden = false
+        }
+
+        weekTopLabel.text = "\(scoreThisWeek!)"
+        weekBottomLabel.text = "\(potentialScoreThisWeek!) pts"
     }
     
     func updateWeeklyReportButton() {
@@ -147,6 +198,18 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
     
     func updateTableCells() {
         weekdayTableView.reloadData()
+    }
+    
+    func updateRadialViews() {
+        if let rep = reportForToday {
+            todayRadialView.setValueAnimated(duration: 1.0, newProgressValue: CGFloat(rep.score) / 100.0)
+        } else {
+            todayRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.0)
+        }
+        weekRadialView.setValueAnimated(duration: 1.0, newProgressValue:
+            CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek))
+        
+        goalRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.50)
     }
     
     // Segue Control
@@ -239,13 +302,13 @@ UITableViewDelegate, ReportTableViewControllerDelegate, WeeklyReportTableViewCon
         let weeklyReportCellVisible = weeklyReport != nil || weeklyReportAvailible
         if section == 0 {
             if weeklyReportCellVisible {
-                return "This Week's Report"
+                return "Weekly Report"
             } else {
-                return "Today's Report"
+                return "Today"
             }
         } else if section == 1 {
             if weeklyReportCellVisible {
-                return "Today's Report"
+                return "Today"
             } else {
                 return "Earlier This Week"
             }

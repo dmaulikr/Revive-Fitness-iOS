@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */; };
 		B666338F1F0337A100AD5966 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B666338E1F0337A100AD5966 /* AppDelegate.swift */; };
 		B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66633901F0337A100AD5966 /* LoginViewController.swift */; };
 		B66633941F0337A100AD5966 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B66633921F0337A100AD5966 /* Main.storyboard */; };
@@ -25,6 +26,7 @@
 
 /* Begin PBXFileReference section */
 		71F1FA24943EB98F72C31F72 /* Pods-ReviveFitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.debug.xcconfig"; sourceTree = "<group>"; };
+		B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialProgressView.swift; sourceTree = "<group>"; };
 		B666338B1F0337A100AD5966 /* ReviveFitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReviveFitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B666338E1F0337A100AD5966 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B66633901F0337A100AD5966 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 				B67CC3841F041EF100B69C93 /* UserProfileViewController.swift */,
 				B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */,
 				B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */,
+				B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */,
 				B66633921F0337A100AD5966 /* Main.storyboard */,
 				B66633951F0337A100AD5966 /* Assets.xcassets */,
 				B66633971F0337A100AD5966 /* LaunchScreen.storyboard */,
@@ -237,6 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */,
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,
 				B67CC3851F041EF100B69C93 /* UserProfileViewController.swift in Sources */,
