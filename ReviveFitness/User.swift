@@ -13,8 +13,10 @@ class User: NSObject {
     
     var phone: String?
     var birthdate: String?
-    var startWeight: String?
-    var startBodyFat: String?
+    var startWeight: Int?
+    var currentWeight: Int?
+    var startBodyFat: Int?
+    var currentBodyFat: Int?
     var oldHabit: String?
     var newHabit: String?
     var fitnessGoal: String?
@@ -26,5 +28,21 @@ class User: NSObject {
         self.password = password
         self.id = id
         self.weekNumber = weekNumber
+    }
+    
+    func loadUserData(from dict: Dictionary<String, String>) {
+        self.birthdate = dict["birth"]
+        self.phone = dict["phone"]
+        self.startWeight = Int(dict["startWeight"]!)
+        self.startBodyFat = Int(dict["startBodyFat"]!)
+        if let currentWeight = dict["currentWeight"] {
+            self.currentWeight = Int(currentWeight)
+        }
+        if let currentBodyFat = dict["currentBodyFat"] {
+            self.currentBodyFat = Int(currentBodyFat)
+        }
+        self.oldHabit = dict["oldHabit"]
+        self.newHabit = dict["newHabit"]
+        self.fitnessGoal = dict["fitnessGoal"]
     }
 }

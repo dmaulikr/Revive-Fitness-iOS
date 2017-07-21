@@ -12,12 +12,38 @@ class WeeklyReportTableViewController: UITableViewController {
     @IBOutlet weak var cancelBarButton: UIBarButtonItem!
     @IBOutlet weak var saveBarButton: UIBarButtonItem!
     @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet weak var scoreLabel: UILabel!
+    
+    
+    @IBOutlet weak var oldHabitSwitch: UISwitch!
+    @IBOutlet weak var newHabitSwitch: UISwitch!
+    @IBOutlet weak var oldHabitTextField: UITextField!
+    @IBOutlet weak var newHabitTextField: UITextField!
+    @IBOutlet weak var fitnessGoalLabel: UILabel!
+    @IBOutlet weak var fitnessGoalSwitch: UISwitch!
+    @IBOutlet weak var weightLabel: UILabel!
+    @IBOutlet weak var bodyFatLabel: UILabel!
+    @IBOutlet weak var weightStepper: UIStepper!
+    @IBOutlet weak var bodyFatStepper: UIStepper!
+    
+    var weekScore = 0
+    let fitnessGoalMultiplier = 1.2
+    var fitnessGoalInitialText = ""
+    var oldHabitInitialText = ""
+    var newHabitInitialText = ""
+    var initialWeight = 0
+    var initialBodyFat = 0
     
     weak var delegate: WeeklyReportTableViewControllerDelegate?
     var reports: [Report?] = [Report]()
     
     @IBAction func save() {
-        let report = WeeklyReport(weekScore: 800)
+        let report = WeeklyReport(weekScore: weekScore,
+                                  changedOld: oldHabitSwitch.isOn, changedNew: newHabitSwitch.isOn,
+                                  oldHabit: oldHabitTextField.text!, newHabit: newHabitTextField.text!,
+                                  completedGoal: fitnessGoalSwitch.isOn,
+                                  newWeight: Int(weightStepper.value),
+                                  newBodyFat: Int(bodyFatStepper.value))
         delegate?.weeklyReportTableViewController(self, didFinishWith: report)
     }
     
@@ -29,12 +55,15 @@ class WeeklyReportTableViewController: UITableViewController {
         updateLabels()
     }
     
-    @IBAction func updateScore() {
+    @IBAction func habitSwitchChanged() {
+        oldHabitTextField.isEnabled = oldHabitSwitch.isOn
+        newHabitTextField.isEnabled = newHabitSwitch.isOn
         updateLabels()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setInitialValues()
         updateLabels()
     }
     
@@ -42,11 +71,40 @@ class WeeklyReportTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+    func setInitialValues() {
+        fitnessGoalLabel.text = fitnessGoalInitialText
+        oldHabitTextField.text = oldHabitInitialText
+        newHabitTextField.text = newHabitInitialText
+        weightStepper.stepValue = Double(initialWeight)
+        bodyFatStepper.stepValue = Double(initialBodyFat)
+    }
+    
     func updatePointsScore() {
+        weekScore = 0
+        
+        for eachReport in reports {
+            if let _ = eachReport {
+                weekScore += eachReport!.score
+            }
+        }
+        
+        if oldHabitSwitch.isOn { weekScore -= 10 }
+        if newHabitSwitch.isOn { weekScore -= 10 }
+        
+        if fitnessGoalSwitch.isOn {
+            weekScore = Int((Double(weekScore) * fitnessGoalMultiplier).rounded())
+        }
     }
     
     func updateLabels() {
         updatePointsScore()
+        
+        scoreLabel.text = "\(weekScore) / \(Int(700.0 * fitnessGoalMultiplier))"
+        weightLabel.text = "\(Int(weightStepper.value)) lbs"
+        weightLabel.textColor = fitnessGoalSwitch.onTintColor
+        bodyFatLabel.text = "\(Int(bodyFatStepper.value))%"
+        bodyFatLabel.textColor = fitnessGoalSwitch.onTintColor
+        
         tableView.reloadData()
     }
 }

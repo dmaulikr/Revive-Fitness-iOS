@@ -158,13 +158,7 @@ class LoginViewController: UIViewController {
         userDataRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 if let userDataDict = snapshot.value as? [String : String] {
-                    self.authenticatedUser!.birthdate = userDataDict["birth"]
-                    self.authenticatedUser!.phone = userDataDict["phone"]
-                    self.authenticatedUser!.startWeight = userDataDict["startWeight"]
-                    self.authenticatedUser!.startBodyFat = userDataDict["startBodyFat"]
-                    self.authenticatedUser!.oldHabit = userDataDict["oldHabit"]
-                    self.authenticatedUser!.newHabit = userDataDict["newHabit"]
-                    self.authenticatedUser!.fitnessGoal = userDataDict["fitnessGoal"]
+                    self.authenticatedUser!.loadUserData(from: userDataDict)
                 }
             }
         })

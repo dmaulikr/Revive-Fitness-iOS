@@ -35,11 +35,11 @@ ProfileSettingsTableViewControllerDelegate {
     @IBOutlet weak var todayRadialAddReportButton: UIButton!
     
     var dayNumberToday: Int! {
-        let dateFormatter = DateFormatter()
+        /*let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
-        return dayNumberToday!
-        //return 7 // ALWAYS SUNDAY (for testing purposes
+        return dayNumberToday!*/
+        return 7 // ALWAYS SUNDAY (for testing purposes
     }
     
     var weekNumberToday: Int! {
@@ -105,6 +105,11 @@ ProfileSettingsTableViewControllerDelegate {
             thisWeekUserReportRef.observe(.value, with: { snapshot in
                 if let _ = snapshot.value {
                     self.weeklyReport = self.loadWeeklyReportData(with: snapshot)
+                    if let _ = self.weeklyReport {
+                        print("~~~ WEEKLY REPORT LOADED")
+                    } else {
+                        self.weeklyReport = nil
+                    }
                 } else {
                     self.weeklyReport = nil
                 }
@@ -130,8 +135,10 @@ ProfileSettingsTableViewControllerDelegate {
     // Weekly Report
     
     func isWeeklyReportAvailible() -> Bool {
+        return true // THIS FUNCTION BUGGY
         if let _ = activeUser {
             if let _ = weeklyReport {
+                print("~~~ WAS AVAILIBLE")
                 if dayNumberToday == 7 {
                     weeklyReportAvailible = true
                     return true
@@ -223,6 +230,9 @@ ProfileSettingsTableViewControllerDelegate {
             let controller = navigationController.topViewController as! WeeklyReportTableViewController
             controller.delegate = self
             controller.reports = self.reports
+            controller.fitnessGoalInitialText = (activeUser?.fitnessGoal)!
+            controller.oldHabitInitialText = (activeUser?.oldHabit)!
+            controller.newHabitInitialText = (activeUser?.newHabit)!
         }
     }
     
@@ -474,6 +484,24 @@ ProfileSettingsTableViewControllerDelegate {
         let userUpdateRef = self.databaseRef.child("users").child(activeUser!.id)
         let weekNumberUpdate = ["week": activeUser!.weekNumber + 1]
         userUpdateRef.updateChildValues(weekNumberUpdate)
+        
+        let userDataUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
+        var userDataUpdate = ["currentWeight": weeklyReport.newWeight!,
+        "currentBodyFat": weeklyReport.newBodyFat!] as [String: Any]
+        
+        if weeklyReport.changedOldHabit {
+            activeUser?.oldHabit = weeklyReport.oldHabit!
+            userDataUpdate["oldHabit"] = weeklyReport.oldHabit!
+        }
+        if weeklyReport.changedNewHabit {
+            activeUser?.newHabit = weeklyReport.newHabit!
+            userDataUpdate["newHabit"] = weeklyReport.newHabit!
+        }
+        
+        activeUser?.currentWeight = weeklyReport.newWeight!
+        activeUser?.currentBodyFat = weeklyReport.newBodyFat!
+        
+        userDataUpdateRef.updateChildValues(userDataUpdate)
     }
     
     func getDay(for number: Int) -> String {

@@ -98,8 +98,12 @@ class ProfileSettingsTableViewController: UITableViewController {
         passwordTextField.text = activeUser.password
         phoneTextField.text = activeUser.phone
         birthdateLabel.text = activeUser.birthdate
-        startingWeightTextField.text = activeUser.startWeight
-        bodyFatTextField.text = activeUser.startBodyFat
+        if let _ = activeUser.startWeight {
+            startingWeightTextField.text = "\(activeUser.startWeight!)"
+        }
+        if let _ = activeUser.startBodyFat {
+            bodyFatTextField.text = "\(activeUser.startBodyFat!)"
+        }
         oldHabitTextField.text = activeUser.oldHabit
         newHabitTextField.text = activeUser.newHabit
         fitnessGoalTextField.text = activeUser.fitnessGoal
@@ -139,8 +143,8 @@ class ProfileSettingsTableViewController: UITableViewController {
         activeUser.password = passwordTextField.text
         activeUser.birthdate = birthdateLabel.text
         activeUser.phone = phoneTextField.text
-        activeUser.startWeight = startingWeightTextField.text
-        activeUser.startBodyFat = bodyFatTextField.text
+        activeUser.startWeight = Int(startingWeightTextField.text!)
+        activeUser.startBodyFat = Int(bodyFatTextField.text!)
         activeUser.oldHabit = oldHabitTextField.text
         activeUser.newHabit = newHabitTextField.text
         activeUser.fitnessGoal = fitnessGoalTextField.text
