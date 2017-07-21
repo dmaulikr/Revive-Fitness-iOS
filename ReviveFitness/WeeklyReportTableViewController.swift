@@ -31,8 +31,8 @@ class WeeklyReportTableViewController: UITableViewController {
     var fitnessGoalInitialText = ""
     var oldHabitInitialText = ""
     var newHabitInitialText = ""
-    var initialWeight = 0
-    var initialBodyFat = 0
+    var initialWeight = 1
+    var initialBodyFat = 1
     
     weak var delegate: WeeklyReportTableViewControllerDelegate?
     var reports: [Report?] = [Report]()

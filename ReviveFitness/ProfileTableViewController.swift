@@ -233,6 +233,16 @@ ProfileSettingsTableViewControllerDelegate {
             controller.fitnessGoalInitialText = (activeUser?.fitnessGoal)!
             controller.oldHabitInitialText = (activeUser?.oldHabit)!
             controller.newHabitInitialText = (activeUser?.newHabit)!
+            if let bodyFat = activeUser?.currentBodyFat {
+                controller.initialBodyFat = bodyFat
+            } else {
+                controller.initialBodyFat = (activeUser?.startBodyFat)!
+            }
+            if let weight = activeUser?.currentWeight {
+                controller.initialWeight = weight
+            } else {
+                controller.initialWeight = (activeUser?.startWeight)!
+            }
         }
     }
     
