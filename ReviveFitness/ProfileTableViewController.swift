@@ -35,11 +35,11 @@ ProfileSettingsTableViewControllerDelegate {
     @IBOutlet weak var todayRadialAddReportButton: UIButton!
     
     var dayNumberToday: Int! {
-        /*let dateFormatter = DateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
-        return dayNumberToday!*/
-        return 7 // ALWAYS SUNDAY (for testing purposes
+        return dayNumberToday!
+        //return 7 // ALWAYS SUNDAY (for testing purposes
     }
     
     var weekNumberToday: Int! {
@@ -135,13 +135,13 @@ ProfileSettingsTableViewControllerDelegate {
     // Weekly Report
     
     func isWeeklyReportAvailible() -> Bool {
-        return true // THIS FUNCTION BUGGY
         if let _ = activeUser {
-            if let _ = weeklyReport {
-                print("~~~ WAS AVAILIBLE")
+            if weeklyReport == nil {
                 if dayNumberToday == 7 {
-                    weeklyReportAvailible = true
-                    return true
+                    if reportForToday != nil {
+                        weeklyReportAvailible = true
+                        return true
+                    }
                 }
             }
         }
@@ -230,13 +230,15 @@ ProfileSettingsTableViewControllerDelegate {
             let controller = navigationController.topViewController as! WeeklyReportTableViewController
             controller.delegate = self
             controller.reports = self.reports
+            
             controller.fitnessGoalInitialText = (activeUser?.fitnessGoal)!
             controller.oldHabitInitialText = (activeUser?.oldHabit)!
             controller.newHabitInitialText = (activeUser?.newHabit)!
+            
             if let bodyFat = activeUser?.currentBodyFat {
                 controller.initialBodyFat = bodyFat
             } else {
-                controller.initialBodyFat = (activeUser?.startBodyFat)!
+                controller.initialBodyFat = (activeUser?.startBodyFat!)!
             }
             if let weight = activeUser?.currentWeight {
                 controller.initialWeight = weight
@@ -251,9 +253,26 @@ ProfileSettingsTableViewControllerDelegate {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
+        let weeklyReportCellVisible = weeklyReport != nil || weeklyReportAvailible
+        
         if indexPath.section == 0 {
-            performSegue(withIdentifier: "CurrentDayReport", sender: self)
-        } else {
+            if weeklyReportCellVisible {
+                performSegue(withIdentifier: "WeeklyReport", sender: self)
+            } else {
+                performSegue(withIdentifier: "CurrentDayReport", sender: self)
+            }
+        } else if indexPath.section == 1 {
+            if weeklyReportCellVisible {
+                performSegue(withIdentifier: "CurrentDayReport", sender: self)
+            } else {
+                if reportForToday != nil {
+                    reportToView = reports[indexPath.row + 1]
+                } else {
+                    reportToView = reports[indexPath.row]
+                }
+                performSegue(withIdentifier: "ViewDayReport", sender: self)
+            }
+        } else if indexPath.section == 2 {
             if reportForToday != nil {
                 reportToView = reports[indexPath.row + 1]
             } else {
@@ -492,20 +511,20 @@ ProfileSettingsTableViewControllerDelegate {
         weeklyReportRef.setValue(weeklyReport.toAnyObject())
         
         let userUpdateRef = self.databaseRef.child("users").child(activeUser!.id)
-        let weekNumberUpdate = ["week": activeUser!.weekNumber + 1]
+        let weekNumberUpdate = ["week": "\(activeUser!.weekNumber + 1)"]
         userUpdateRef.updateChildValues(weekNumberUpdate)
         
         let userDataUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
-        var userDataUpdate = ["currentWeight": weeklyReport.newWeight!,
-        "currentBodyFat": weeklyReport.newBodyFat!] as [String: Any]
+        var userDataUpdate = ["currentWeight": "\(weeklyReport.newWeight!)",
+        "currentBodyFat": "\(weeklyReport.newBodyFat!)"] as [String: String]
         
         if weeklyReport.changedOldHabit {
             activeUser?.oldHabit = weeklyReport.oldHabit!
-            userDataUpdate["oldHabit"] = weeklyReport.oldHabit!
+            userDataUpdate["oldHabit"] = "\(weeklyReport.oldHabit!)"
         }
         if weeklyReport.changedNewHabit {
             activeUser?.newHabit = weeklyReport.newHabit!
-            userDataUpdate["newHabit"] = weeklyReport.newHabit!
+            userDataUpdate["newHabit"] = "\(weeklyReport.newHabit!)"
         }
         
         activeUser?.currentWeight = weeklyReport.newWeight!

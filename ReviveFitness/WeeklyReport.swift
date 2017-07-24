@@ -48,18 +48,18 @@ class WeeklyReport: NSObject {
         self.didCompleteGoal = (dict["completedGoal"]!).toBool()
     }
     
-    func toAnyObject() -> Dictionary<String, Any> {
+    func toAnyObject() -> Dictionary<String, String> {
         let dict = [
-            "weekScore": self.weekScore!,
-            "newWeight": self.newWeight,
-            "newBodyFat": self.newBodyFat,
+            "weekScore": "\(self.weekScore!)",
+            "newWeight": "\(self.newWeight!)",
+            "newBodyFat": "\(self.newBodyFat!)",
             "oldHabit": self.oldHabit!,
             "newHabit": self.newHabit!,
             "submissionDate": self.submissionDate!,
             "changedOld": self.changedOldHabit.toString()!,
             "changedNew": self.changedNewHabit.toString()!,
             "completedGoal": self.didCompleteGoal.toString()!
-        ] as [String : Any]
+        ] as [String : String]
         return dict
     }
     

@@ -102,11 +102,12 @@ class LoginViewController: UIViewController {
                     errorMessageLabel.text = ""
                     return true
                 } else {
-                    errorMessageLabel.text = "Incorrect password, please try again"
+                    errorMessageLabel.text = "Incorrect password, please try again."
+                    return false
                 }
             }
         }
-        errorMessageLabel.text = "Email not recognized"
+        errorMessageLabel.text = "Email not recognized, sorry!"
         authenticatedUser = nil
         return false
     }
@@ -131,18 +132,7 @@ class LoginViewController: UIViewController {
             if let usersDict = snapshotDict["users"] as? [String : NSDictionary] {
                 for eachUserId in usersDict {
                     let userDict = usersDict[eachUserId.key]!
-                    let fname = userDict["name-first"] as? String
-                    let lname = userDict["name-last"] as? String
-                    let email = userDict["email"] as? String
-                    let password = userDict["password"] as? String
-                    let id = userDict["id"] as? String
-                    let weekNumber = userDict["week"] as? Int
-                    if fname != nil && lname != nil && email != nil && password != nil {
-                        let loadedUser = User(fname: fname!, lname: lname!,
-                                             email: email!, password: password!,
-                                             id: id!, weekNumber: weekNumber!)
-                        loadedUsers.append(loadedUser)
-                    }
+                    loadedUsers.append(User.init(of: userDict as! Dictionary<String, String>))
                 }
             }
             

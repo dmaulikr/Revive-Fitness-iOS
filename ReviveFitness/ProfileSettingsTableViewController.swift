@@ -126,14 +126,14 @@ class ProfileSettingsTableViewController: UITableViewController {
                                        "email": emailTextField.text!,
                                        "password": passwordTextField.text!,
                                        "id": activeUser.id,
-                                       "week": activeUser.weekNumber])
-        updateUserDataRef.setValue(["phone": phoneTextField.text,
-                                    "birth": birthdateLabel.text,
-                                    "startWeight": startingWeightTextField.text,
-                                    "startBodyFat": bodyFatTextField.text,
-                                    "oldHabit": oldHabitTextField.text,
-                                    "newHabit": newHabitTextField.text,
-                                    "fitnessGoal": fitnessGoalTextField.text])
+                                       "week": "\(activeUser.weekNumber!)"])
+        updateUserDataRef.setValue(["phone": phoneTextField.text!,
+                                    "birth": birthdateLabel.text!,
+                                    "startWeight": startingWeightTextField.text!,
+                                    "startBodyFat": bodyFatTextField.text!,
+                                    "oldHabit": oldHabitTextField.text!,
+                                    "newHabit": newHabitTextField.text!,
+                                    "fitnessGoal": fitnessGoalTextField.text!])
     }
     
     func updateUserInstance() {

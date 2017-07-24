@@ -30,9 +30,18 @@ class User: NSObject {
         self.weekNumber = weekNumber
     }
     
+    init(of dict: Dictionary<String, String>) {
+        self.firstName = dict["name-first"]
+        self.lastName = dict["name-last"]
+        self.email = dict["email"]
+        self.password = dict["password"]
+        self.id = dict["id"]
+        self.weekNumber = Int(dict["week"]!)
+    }
+    
     func loadUserData(from dict: Dictionary<String, String>) {
-        self.birthdate = dict["birth"]
-        self.phone = dict["phone"]
+        self.birthdate = dict["birth"]!
+        self.phone = dict["phone"]!
         self.startWeight = Int(dict["startWeight"]!)
         self.startBodyFat = Int(dict["startBodyFat"]!)
         if let currentWeight = dict["currentWeight"] {
@@ -41,8 +50,8 @@ class User: NSObject {
         if let currentBodyFat = dict["currentBodyFat"] {
             self.currentBodyFat = Int(currentBodyFat)
         }
-        self.oldHabit = dict["oldHabit"]
-        self.newHabit = dict["newHabit"]
-        self.fitnessGoal = dict["fitnessGoal"]
+        self.oldHabit = dict["oldHabit"]!
+        self.newHabit = dict["newHabit"]!
+        self.fitnessGoal = dict["fitnessGoal"]!
     }
 }

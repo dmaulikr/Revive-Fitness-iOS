@@ -75,8 +75,8 @@ class WeeklyReportTableViewController: UITableViewController {
         fitnessGoalLabel.text = fitnessGoalInitialText
         oldHabitTextField.text = oldHabitInitialText
         newHabitTextField.text = newHabitInitialText
-        weightStepper.stepValue = Double(initialWeight)
-        bodyFatStepper.stepValue = Double(initialBodyFat)
+        weightStepper.value = Double(initialWeight)
+        bodyFatStepper.value = Double(initialBodyFat)
     }
     
     func updatePointsScore() {
