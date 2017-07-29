@@ -9,6 +9,8 @@ class PickTeamTableViewController: UITableViewController {
     var chosenTeam: Team?
     var activeUser: User?
     
+    final let TEAM_LIMIT = 12
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -71,7 +73,7 @@ class PickTeamTableViewController: UITableViewController {
                     let team = teams[indexPath.row]
                     cell.textLabel?.text = team.teamName
                     cell.detailTextLabel?.text = "\(team.numberOfMembers!)/12"
-                    if team.numberOfMembers >= 12 {
+                    if team.numberOfMembers >= TEAM_LIMIT {
                         cell.detailTextLabel?.textColor = UIColor.lightGray
                     }
                 }
@@ -96,6 +98,16 @@ class PickTeamTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row < teams.count {
+            if teams[indexPath.row].numberOfMembers < TEAM_LIMIT {
+                chosenTeam = teams[indexPath.row]
+                joinTeam(chosenTeam!)
+                self.performSegue(withIdentifier: "TeamProfile", sender: self)
+            } else {
+                popFullTeamAlert(with: teams[indexPath.row].teamName)
+            }
+        }
+        
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -128,6 +140,7 @@ class PickTeamTableViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "Done", style: .default, handler:{ (UIAlertAction) in
             if let teamName = self.nameField.text {
                 self.saveTeamToFirebase(with: teamName)
+                self.performSegue(withIdentifier: "TeamProfile", sender: self)
             }
         }))
         self.present(alert, animated: true, completion: nil)
@@ -150,7 +163,44 @@ class PickTeamTableViewController: UITableViewController {
         let userUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
         let teamUpdate = ["team": activeUser!.teamId!]
         userUpdateRef.updateChildValues(teamUpdate)
+    }
+    
+    func joinTeam(_ team: Team) {
+        let teamRef = databaseRef.child("teams").child(team.id)
+        team.members[activeUser!.id] = activeUser!.firstName + " " + activeUser!.lastName
+        team.numberOfMembers = team.numberOfMembers + 1
+        teamRef.setValue(team.toAnyObject())
         
-        dismiss(animated: true, completion: nil)
+        let teamMembersRef = databaseRef.child("teamMembers").child(team.id)
+        teamMembersRef.setValue(team.toAnyObjectMembers())
+        
+        activeUser?.teamId = team.id
+        let userUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
+        let teamUpdate = ["team": activeUser!.teamId!]
+        userUpdateRef.updateChildValues(teamUpdate)
+    }
+    
+    // UIAlert Controllers
+    
+    func popFullTeamAlert(with teamName: String) {
+        let alert = UIAlertController(title: "Unable to Join",
+                                      message: "\(teamName) is full already - please select a different team.",
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        
+        alert.addAction(action)
+        present(alert, animated: true)
+    }
+    
+    // Segue Control
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "TeamProfile" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! TeamProfileTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.activeUser
+            controller.activeTeamId = self.activeUser?.teamId
+        }
     }
 }
