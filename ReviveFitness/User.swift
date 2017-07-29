@@ -22,6 +22,10 @@ class User: NSObject {
     var fitnessGoal: String?
     var teamId: String?
     
+    // Optional reports and weeklyReport, used only in TeamProfile to calculate score
+    var reports = [Report]()
+    var weeklyReport: WeeklyReport?
+    
     init(fname: String, lname: String, email: String, password: String, id: String, weekNumber: Int) {
         self.firstName = fname
         self.lastName = lname

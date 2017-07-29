@@ -114,7 +114,6 @@ ProfileSettingsTableViewControllerDelegate {
                 if let _ = snapshot.value {
                     self.weeklyReport = self.loadWeeklyReportData(with: snapshot)
                     if let _ = self.weeklyReport {
-                        print("~~~ WEEKLY REPORT LOADED")
                     } else {
                         self.weeklyReport = nil
                     }
@@ -123,6 +122,7 @@ ProfileSettingsTableViewControllerDelegate {
                 }
                 self.tableView.reloadData()
                 self.updateUIElements()
+                self.updateTeamScore()
             })
             
             let dailyReportsRef =
@@ -136,7 +136,16 @@ ProfileSettingsTableViewControllerDelegate {
                 }
                 self.tableView.reloadData()
                 self.updateUIElements()
+                self.updateTeamScore()
             })
+        }
+    }
+    
+    func updateTeamScore() {
+        if let teamId = activeUser?.teamId {
+            let teamScoreRef = databaseRef.child("teamScores").child(teamId)
+            let userTeamScoreUpdate = [activeUser!.id: "\(scoreThisWeek!)"]
+            teamScoreRef.updateChildValues(userTeamScoreUpdate)
         }
     }
     
