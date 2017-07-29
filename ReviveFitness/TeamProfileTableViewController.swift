@@ -21,6 +21,7 @@ class TeamProfileTableViewController: UITableViewController {
     var activeTeam: Team?
     var activeUser: User?
     var teamMemberScores = [String: UserScore]()
+    var teamMemberArray = [UserScore]()
     
     @IBOutlet weak var nameLabel: UILabel!
     
@@ -177,6 +178,7 @@ class TeamProfileTableViewController: UITableViewController {
                     self.teamMemberScores[eachMember.key]?.submitted = false
                 }
                 self.updateUIElements()
+                self.tableView.reloadData()
             })
         }
     }
@@ -206,10 +208,12 @@ class TeamProfileTableViewController: UITableViewController {
     }
     
     func loadUserScores(with snapshot: DataSnapshot) -> [String: UserScore] {
+        teamMemberArray = [UserScore]()
         var loadedUserScores = [String: UserScore]()
         if let userScoresDict = snapshot.value as? [String: String] {
             for eachUser in userScoresDict {
                 loadedUserScores[eachUser.key] = (UserScore(id: eachUser.key, score: Int(eachUser.value)!))
+                teamMemberArray.append(UserScore(id: eachUser.key, score: Int(eachUser.value)!))
             }
         }
         return loadedUserScores
@@ -241,12 +245,23 @@ class TeamProfileTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // THIS FUNCTION VERY BUGGY
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemberCell")!
         if indexPath.row < (activeTeam?.members.count)! {
-            let user = activeUser // CHANGE THIS TO TEAM USERS
-            cell.textLabel?.text = (user?.firstName)! + " " + (user?.lastName)!
-            cell.detailTextLabel?.text = "Remind"
-            cell.detailTextLabel?.textColor = UIColor.lightGray
+            if teamMemberArray.count == activeTeam?.members.count {
+                let member = teamMemberArray[indexPath.row]
+                let name = activeTeam?.members[member.id]
+                cell.textLabel?.text = name
+                if member.submitted {
+                    cell.detailTextLabel?.text = "Remind"
+                    cell.detailTextLabel?.textColor = rankTopLabel.textColor
+                    cell.accessoryType = .none
+                } else {
+                    cell.detailTextLabel?.text = "Submitted"
+                    cell.detailTextLabel?.textColor = UIColor.lightGray
+                    cell.accessoryType = .checkmark
+                }
+            }
         }
         return cell
     }
