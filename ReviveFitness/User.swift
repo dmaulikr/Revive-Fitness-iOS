@@ -20,6 +20,7 @@ class User: NSObject {
     var oldHabit: String?
     var newHabit: String?
     var fitnessGoal: String?
+    var teamId: String?
     
     init(fname: String, lname: String, email: String, password: String, id: String, weekNumber: Int) {
         self.firstName = fname
@@ -53,5 +54,8 @@ class User: NSObject {
         self.oldHabit = dict["oldHabit"]!
         self.newHabit = dict["newHabit"]!
         self.fitnessGoal = dict["fitnessGoal"]!
+        if dict.keys.contains("team") {
+            self.teamId = dict["team"]
+        }
     }
 }

@@ -72,6 +72,14 @@ ProfileSettingsTableViewControllerDelegate {
         performSegue(withIdentifier: "EditProfile", sender: self)
     }
     
+    @IBAction func teamButtonTapped() {
+        if activeUser!.teamId != nil {
+            performSegue(withIdentifier: "TeamProfile", sender: self)
+        } else {
+            performSegue(withIdentifier: "PickTeam", sender: self)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -162,7 +170,7 @@ ProfileSettingsTableViewControllerDelegate {
         updateRadialLabels()
     }
     
-    func updateRadialLabels() {
+    func updateRadialLabels() {  
         if let rep = reportForToday {
             todayTopLabel.text = ("\((rep.score)!)")
             todayBottomLabel.text = "100 pts"
@@ -245,6 +253,17 @@ ProfileSettingsTableViewControllerDelegate {
             } else {
                 controller.initialWeight = (activeUser?.startWeight)!
             }
+        } else if segue.identifier == "PickTeam" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! PickTeamTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.activeUser
+        } else if segue.identifier == "TeamProfile" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! TeamProfileTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.activeUser
+            controller.activeTeamId = self.activeUser?.teamId
         }
     }
     

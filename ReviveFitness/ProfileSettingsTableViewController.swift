@@ -133,7 +133,8 @@ class ProfileSettingsTableViewController: UITableViewController {
                                     "startBodyFat": bodyFatTextField.text!,
                                     "oldHabit": oldHabitTextField.text!,
                                     "newHabit": newHabitTextField.text!,
-                                    "fitnessGoal": fitnessGoalTextField.text!])
+                                    "fitnessGoal": fitnessGoalTextField.text!,
+                                    "team": activeUser.teamId])
     }
     
     func updateUserInstance() {
