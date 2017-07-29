@@ -6,6 +6,7 @@ import FirebaseDatabase
 struct UserScore {
     let id: String
     let scoreThisWeek: Int
+    var submitted = false
     
     init(id: String, score: Int) {
         self.id = id
@@ -19,7 +20,7 @@ class TeamProfileTableViewController: UITableViewController {
     var activeTeamId: String?
     var activeTeam: Team?
     var activeUser: User?
-    var teamMemberScores = [UserScore]()
+    var teamMemberScores = [String: UserScore]()
     
     @IBOutlet weak var nameLabel: UILabel!
     
@@ -56,7 +57,7 @@ class TeamProfileTableViewController: UITableViewController {
     var scoreThisWeek: Int! {
         var tempScore = 0
         for eachUserScore in teamMemberScores {
-            tempScore += eachUserScore.scoreThisWeek
+            tempScore += (teamMemberScores[eachUserScore.key]?.scoreThisWeek)!
         }
         return tempScore
     }
@@ -66,6 +67,13 @@ class TeamProfileTableViewController: UITableViewController {
         } else {
             return dayNumberToday * 100 * activeTeam!.numberOfMembers
         }
+    }
+    var numberOfSubmissions: Int! {
+        var numSubs = 0
+        for eachMember in teamMemberScores {
+            if eachMember.value.submitted { numSubs += 1 }
+        }
+        return numSubs
     }
     
     override func viewDidLoad() {
@@ -86,6 +94,49 @@ class TeamProfileTableViewController: UITableViewController {
         updateRadialViews()
     }
     
+    // UI Functions
+    
+    func updateUIElements() {
+        updateLabels()
+        self.tableView.reloadData()
+    }
+    
+    func updateLabels() {
+        nameLabel.text = "Team \((activeTeam?.teamName)!)"
+        updateRadialLabels()
+    }
+    
+    func updateRadialLabels() {
+        rankTopLabel.text = "3"
+        rankBottomLabel.text = "7 teams"
+        
+        submissionsTopLabel.text = "\(numberOfSubmissions!)"
+        submissionsBottomLabel.text = "\(teamMemberScores.count) reports"
+        
+        scoreTopLabel.text = "\(scoreThisWeek!)"
+        scoreBottomLabel.text = "\(potentialScoreThisWeek!) pts"
+    }
+    
+    func updateRadialViews() {
+        rankRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.58)
+        submissionsRadialView.setValueAnimated(duration: 1.0, newProgressValue:
+            CGFloat(numberOfSubmissions) / CGFloat(teamMemberScores.count))
+        scoreRadialView.setValueAnimated(duration: 1.0, newProgressValue:
+            CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek))
+    }
+    
+    func initializeRadialViews() {
+        // Called once when view loads
+        rankRadialView.progressStroke = rankTopLabel.textColor
+        rankRadialView.createCircles()
+        submissionsRadialView.progressStroke = submissionsTopLabel.textColor
+        submissionsRadialView.createCircles()
+        scoreRadialView.progressStroke = scoreTopLabel.textColor
+        scoreRadialView.createCircles()
+    }
+
+    // Firebase functions
+    
     func addFirebaseObservers() {
         let teamsRef = databaseRef.child("teams").child((activeTeamId)!)
         teamsRef.observe(.value, with: { snapshot in
@@ -105,52 +156,38 @@ class TeamProfileTableViewController: UITableViewController {
         teamScoresRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.teamMemberScores = self.loadUserScores(with: snapshot)
+                self.addSubmissionObservers()
                 self.updateUIElements()
             }
         })
     }
     
-    // UI Functions
-    
-    func updateUIElements() {
-        updateLabels()
-        self.tableView.reloadData()
+    func addSubmissionObservers() {
+        for eachMember in teamMemberScores {
+            let memberSubmissionRef =
+                databaseRef.child("reports").child(
+                    "Year-\(currentYear!)").child(
+                        "Week-\(weekNumberToday!)").child(
+                            eachMember.key).child(
+                                "Day-\(dayNumberToday!)")
+            memberSubmissionRef.observe(.value, with: { snapshot in
+                if let _ = snapshot.value {
+                    self.teamMemberScores[eachMember.key]?.submitted = self.checkUserSubmission(with: snapshot)
+                } else {
+                    self.teamMemberScores[eachMember.key]?.submitted = false
+                }
+                self.updateUIElements()
+            })
+        }
     }
     
-    func updateLabels() {
-        nameLabel.text = "Team \((activeTeam?.teamName)!)"
-        updateRadialLabels()
+    func checkUserSubmission(with snapshot: DataSnapshot) -> Bool {
+        if (snapshot.value as? [String: String]) != nil {
+            return true
+        } else {
+            return false
+        }
     }
-    
-    func updateRadialLabels() {
-        rankTopLabel.text = "3"
-        rankBottomLabel.text = "7 teams"
-        
-        scoreTopLabel.text = "8"
-        scoreBottomLabel.text = "12 reports"
-        
-        scoreTopLabel.text = "\(scoreThisWeek!)"
-        scoreBottomLabel.text = "\(potentialScoreThisWeek!) pts"
-    }
-    
-    func updateRadialViews() {
-        rankRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.58)
-        submissionsRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.75)
-        scoreRadialView.setValueAnimated(duration: 1.0, newProgressValue:
-            CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek))
-    }
-    
-    func initializeRadialViews() {
-        // Called once when view loads
-        rankRadialView.progressStroke = rankTopLabel.textColor
-        rankRadialView.createCircles()
-        submissionsRadialView.progressStroke = submissionsTopLabel.textColor
-        submissionsRadialView.createCircles()
-        scoreRadialView.progressStroke = scoreTopLabel.textColor
-        scoreRadialView.createCircles()
-    }
-
-    // Firebase functions
     
     func loadTeam(with snapshot: DataSnapshot) -> Team? {
         if let teamDict = snapshot.value as? [String: String] {
@@ -168,11 +205,11 @@ class TeamProfileTableViewController: UITableViewController {
         }
     }
     
-    func loadUserScores(with snapshot: DataSnapshot) -> [UserScore] {
-        var loadedUserScores = [UserScore]()
+    func loadUserScores(with snapshot: DataSnapshot) -> [String: UserScore] {
+        var loadedUserScores = [String: UserScore]()
         if let userScoresDict = snapshot.value as? [String: String] {
             for eachUser in userScoresDict {
-                loadedUserScores.append(UserScore(id: eachUser.key, score: Int(eachUser.value)!))
+                loadedUserScores[eachUser.key] = (UserScore(id: eachUser.key, score: Int(eachUser.value)!))
             }
         }
         return loadedUserScores
