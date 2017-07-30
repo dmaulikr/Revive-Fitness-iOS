@@ -45,7 +45,11 @@ ProfileSettingsTableViewControllerDelegate {
     var weekNumberToday: Int! {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ww" // Produces int corresponding to week of year
-        let weekNumberToday = Int(dateFormatter.string(from: Date()))
+        
+        let today = Date() // Account for week starting on monday, not sunday
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)
+        
+        let weekNumberToday = Int(dateFormatter.string(from: yesterday!))
         return weekNumberToday!
     }
     
@@ -58,6 +62,10 @@ ProfileSettingsTableViewControllerDelegate {
     
     var scoreThisWeek: Int! {
         var tempScore = 0
+        if let _ = weeklyReport {
+            tempScore = weeklyReport!.weekScore
+            return tempScore
+        }
         for eachReport in reports {
             tempScore += (eachReport?.score)!
         }
@@ -65,7 +73,11 @@ ProfileSettingsTableViewControllerDelegate {
     }
     
     var potentialScoreThisWeek: Int! {
-        return dayNumberToday * 100
+        if dayNumberToday == 7 {
+            return 840
+        } else {
+            return dayNumberToday * 100
+        }
     }
     
     @IBAction func settingsButtonTapped() {
@@ -262,6 +274,15 @@ ProfileSettingsTableViewControllerDelegate {
             } else {
                 controller.initialWeight = (activeUser?.startWeight)!
             }
+        } else if segue.identifier == "ViewWeeklyReport" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! WeeklyReportTableViewController
+            controller.delegate = self
+            if let _ = weeklyReport {
+                controller.reportToView = weeklyReport!
+                controller.isReportViewOnly = true
+                controller.fitnessGoalInitialText = (activeUser?.fitnessGoal)!
+            }
         } else if segue.identifier == "PickTeam" {
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! PickTeamTableViewController
@@ -285,13 +306,22 @@ ProfileSettingsTableViewControllerDelegate {
         
         if indexPath.section == 0 {
             if weeklyReportCellVisible {
-                performSegue(withIdentifier: "WeeklyReport", sender: self)
+                if let _ = weeklyReport {
+                    performSegue(withIdentifier: "ViewWeeklyReport", sender: self)
+                } else {
+                    performSegue(withIdentifier: "WeeklyReport", sender: self)
+                }
             } else {
                 performSegue(withIdentifier: "CurrentDayReport", sender: self)
             }
         } else if indexPath.section == 1 {
             if weeklyReportCellVisible {
-                performSegue(withIdentifier: "CurrentDayReport", sender: self)
+                if reportForToday != nil {
+                    reportToView = reportForToday
+                } else {
+                    reportToView = reports[0]
+                }
+                performSegue(withIdentifier: "ViewDayReport", sender: self)
             } else {
                 if reportForToday != nil {
                     reportToView = reports[indexPath.row + 1]

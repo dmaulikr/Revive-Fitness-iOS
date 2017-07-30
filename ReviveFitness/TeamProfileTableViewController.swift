@@ -30,18 +30,25 @@ class TeamProfileTableViewController: UITableViewController {
         return dayNumberToday!
         //return 7 // ALWAYS SUNDAY (for testing purposes
     }
+    
     var weekNumberToday: Int! {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "ww" // Produces int corresponding to week of year
-        let weekNumberToday = Int(dateFormatter.string(from: Date()))
+        
+        let today = Date() // Account for week starting on monday, not sunday
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)
+        
+        let weekNumberToday = Int(dateFormatter.string(from: yesterday!))
         return weekNumberToday!
     }
+    
     var currentYear: Int! {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy"
         let currentYear = Int(dateFormatter.string(from: Date()))
         return currentYear!
     }
+    
     var scoreThisWeek: Int! {
         var tempScore = 0
         for eachMember in teamMembers {
@@ -49,6 +56,7 @@ class TeamProfileTableViewController: UITableViewController {
         }
         return tempScore
     }
+    
     var potentialScoreThisWeek: Int! {
         if dayNumberToday == 7 {
             return activeTeam!.numberOfMembers * 840
@@ -56,6 +64,7 @@ class TeamProfileTableViewController: UITableViewController {
             return dayNumberToday * 100 * activeTeam!.numberOfMembers
         }
     }
+    
     var numberOfSubmissions: Int! {
         var numSubs = 0
         for eachMember in teamMembers {

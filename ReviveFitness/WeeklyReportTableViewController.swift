@@ -26,6 +26,9 @@ class WeeklyReportTableViewController: UITableViewController {
     @IBOutlet weak var weightStepper: UIStepper!
     @IBOutlet weak var bodyFatStepper: UIStepper!
     
+    var reportToView: WeeklyReport?
+    var isReportViewOnly = false
+    
     var weekScore = 0
     let fitnessGoalMultiplier = 1.2
     var fitnessGoalInitialText = ""
@@ -38,13 +41,17 @@ class WeeklyReportTableViewController: UITableViewController {
     var reports: [Report?] = [Report]()
     
     @IBAction func save() {
-        let report = WeeklyReport(weekScore: weekScore,
-                                  changedOld: oldHabitSwitch.isOn, changedNew: newHabitSwitch.isOn,
-                                  oldHabit: oldHabitTextField.text!, newHabit: newHabitTextField.text!,
-                                  completedGoal: fitnessGoalSwitch.isOn,
-                                  newWeight: Int(weightStepper.value),
-                                  newBodyFat: Int(bodyFatStepper.value))
-        delegate?.weeklyReportTableViewController(self, didFinishWith: report)
+        if isReportViewOnly {
+            delegate?.weeklyReportTableViewControllerDidCancel(self)
+        } else {
+            let report = WeeklyReport(weekScore: weekScore,
+                                      changedOld: oldHabitSwitch.isOn, changedNew: newHabitSwitch.isOn,
+                                      oldHabit: oldHabitTextField.text!, newHabit: newHabitTextField.text!,
+                                      completedGoal: fitnessGoalSwitch.isOn,
+                                      newWeight: Int(weightStepper.value),
+                                      newBodyFat: Int(bodyFatStepper.value))
+            delegate?.weeklyReportTableViewController(self, didFinishWith: report)
+        }
     }
     
     @IBAction func cancel() {
@@ -53,6 +60,12 @@ class WeeklyReportTableViewController: UITableViewController {
     
     @IBAction func stepperScoreChanged(sender: UIStepper) {
         updateLabels()
+        if Int(weightStepper.value) != initialWeight {
+            weightLabel.isEnabled = true
+        }
+        if Int(bodyFatStepper.value) != initialBodyFat {
+            bodyFatLabel.isEnabled = true
+        }
     }
     
     @IBAction func habitSwitchChanged() {
@@ -71,28 +84,52 @@ class WeeklyReportTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+    func disableUIElements() {
+        oldHabitSwitch.isEnabled = false
+        newHabitSwitch.isEnabled = false
+        fitnessGoalSwitch.isEnabled = false
+        weightStepper.isEnabled = false
+        bodyFatStepper.isEnabled = false
+    }
+    
     func setInitialValues() {
-        fitnessGoalLabel.text = fitnessGoalInitialText
-        oldHabitTextField.text = oldHabitInitialText
-        newHabitTextField.text = newHabitInitialText
-        weightStepper.value = Double(initialWeight)
-        bodyFatStepper.value = Double(initialBodyFat)
+        if isReportViewOnly {
+            fitnessGoalLabel.text = fitnessGoalInitialText
+            oldHabitTextField.text = (reportToView?.oldHabit)!
+            newHabitTextField.text = (reportToView?.newHabit)!
+            weightStepper.value = Double((reportToView?.newWeight)!)
+            bodyFatStepper.value = Double((reportToView?.newBodyFat)!)
+            oldHabitSwitch.isOn = (reportToView?.changedOldHabit)!
+            newHabitSwitch.isOn = (reportToView?.changedNewHabit)!
+            fitnessGoalSwitch.isOn = (reportToView?.didCompleteGoal)!
+            disableUIElements()
+            saveBarButton.title = "Done"
+            saveButton.setTitle("Done", for: .normal)
+            self.navigationItem.title = "View Weekly Report"
+        } else {
+            fitnessGoalLabel.text = fitnessGoalInitialText
+            oldHabitTextField.text = oldHabitInitialText
+            newHabitTextField.text = newHabitInitialText
+            weightStepper.value = Double(initialWeight)
+            bodyFatStepper.value = Double(initialBodyFat)
+        }
     }
     
     func updatePointsScore() {
-        weekScore = 0
-        
-        for eachReport in reports {
-            if let _ = eachReport {
-                weekScore += eachReport!.score
+        if isReportViewOnly {
+            weekScore = reportToView!.weekScore
+        } else {
+            weekScore = 0
+            for eachReport in reports {
+                if let _ = eachReport {
+                    weekScore += eachReport!.score
+                }
             }
-        }
-        
-        if oldHabitSwitch.isOn { weekScore -= 10 }
-        if newHabitSwitch.isOn { weekScore -= 10 }
-        
-        if fitnessGoalSwitch.isOn {
-            weekScore = Int((Double(weekScore) * fitnessGoalMultiplier).rounded())
+            if oldHabitSwitch.isOn { weekScore -= 10 }
+            if newHabitSwitch.isOn { weekScore -= 10 }
+            if fitnessGoalSwitch.isOn {
+                weekScore = Int((Double(weekScore) * fitnessGoalMultiplier).rounded())
+            }
         }
     }
     
@@ -101,9 +138,9 @@ class WeeklyReportTableViewController: UITableViewController {
         
         scoreLabel.text = "\(weekScore) / \(Int(700.0 * fitnessGoalMultiplier))"
         weightLabel.text = "\(Int(weightStepper.value)) lbs"
-        weightLabel.textColor = fitnessGoalSwitch.onTintColor
+        weightLabel.textColor = saveButton.backgroundColor
         bodyFatLabel.text = "\(Int(bodyFatStepper.value))%"
-        bodyFatLabel.textColor = fitnessGoalSwitch.onTintColor
+        bodyFatLabel.textColor = saveButton.backgroundColor
         
         tableView.reloadData()
     }

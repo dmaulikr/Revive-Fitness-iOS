@@ -85,7 +85,6 @@ class ReportTableViewController: UITableViewController {
                 disableUIElements()
                 self.navigationItem.title = "View Report"
                 saveBarButton.title = "Done"
-                cancelBarButton.title = "< Back"
                 saveButton.setTitle("Done", for: .normal)
             }
             
