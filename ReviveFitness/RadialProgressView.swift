@@ -18,6 +18,9 @@ class RadialProgressView: UIView {
     // Between 0 and 1, denotes how much of circle is filled
     var progress: CGFloat = 0.0
     
+    // Used to stop radial view from animating more than once (has the effect of seeming to instantly fill)
+    var targetProgress: CGFloat = 0.0
+    
     override init(frame: CGRect) {
         staticCircleLayer = CAShapeLayer()
         progressCircleLayer = CAShapeLayer()

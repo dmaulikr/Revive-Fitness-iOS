@@ -172,7 +172,8 @@ class PickTeamTableViewController: UITableViewController {
         teamRef.setValue(team.toAnyObject())
         
         let teamMembersRef = databaseRef.child("teamMembers").child(team.id)
-        teamMembersRef.setValue(team.toAnyObjectMembers())
+        let teamMemberUpdate = [activeUser!.id: activeUser!.firstName + " " + activeUser!.lastName]
+        teamMembersRef.updateChildValues(teamMemberUpdate)
         
         activeUser?.teamId = team.id
         let userUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)

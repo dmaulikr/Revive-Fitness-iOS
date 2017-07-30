@@ -24,6 +24,7 @@
 		B6AD0E911F2BF5320091350A /* PickTeamTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */; };
 		B6AD0E931F2BF5460091350A /* TeamProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AD0E921F2BF5460091350A /* TeamProfileTableViewController.swift */; };
 		B6AD0E951F2BF8C60091350A /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AD0E941F2BF8C60091350A /* Team.swift */; };
+		B6AD0E971F2E1DB50091350A /* TeamMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AD0E961F2E1DB50091350A /* TeamMember.swift */; };
 		C1825EC38A3700232B8CF691 /* Pods_ReviveFitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +49,7 @@
 		B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickTeamTableViewController.swift; sourceTree = "<group>"; };
 		B6AD0E921F2BF5460091350A /* TeamProfileTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamProfileTableViewController.swift; sourceTree = "<group>"; };
 		B6AD0E941F2BF8C60091350A /* Team.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
+		B6AD0E961F2E1DB50091350A /* TeamMember.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamMember.swift; sourceTree = "<group>"; };
 		EA470CA725A65E58DA65E5D5 /* Pods-ReviveFitness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.release.xcconfig"; sourceTree = "<group>"; };
 		EC10C922A255CAEDB00A8BDE /* Pods_ReviveFitness.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReviveFitness.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -94,6 +96,7 @@
 				B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */,
 				B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */,
 				B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */,
+				B6AD0E961F2E1DB50091350A /* TeamMember.swift */,
 				B6AD0E921F2BF5460091350A /* TeamProfileTableViewController.swift */,
 				B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */,
 				B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */,
@@ -253,6 +256,7 @@
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
 				B6AD0E951F2BF8C60091350A /* Team.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,
+				B6AD0E971F2E1DB50091350A /* TeamMember.swift in Sources */,
 				B67CC3851F041EF100B69C93 /* ProfileTableViewController.swift in Sources */,
 				B6AD0E911F2BF5320091350A /* PickTeamTableViewController.swift in Sources */,
 				B6A561791F196D3200F1A0C7 /* WeeklyReport.swift in Sources */,

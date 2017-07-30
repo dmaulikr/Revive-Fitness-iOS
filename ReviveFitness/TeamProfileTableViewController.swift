@@ -2,26 +2,13 @@
 import UIKit
 import FirebaseDatabase
 
-
-struct UserScore {
-    let id: String
-    let scoreThisWeek: Int
-    var submitted = false
-    
-    init(id: String, score: Int) {
-        self.id = id
-        self.scoreThisWeek = score
-    }
-}
-
 class TeamProfileTableViewController: UITableViewController {
     
     var databaseRef: DatabaseReference!
     var activeTeamId: String?
     var activeTeam: Team?
     var activeUser: User?
-    var teamMemberScores = [String: UserScore]()
-    var teamMemberArray = [UserScore]()
+    var teamMembers = [TeamMember]()
     
     @IBOutlet weak var nameLabel: UILabel!
     
@@ -57,8 +44,8 @@ class TeamProfileTableViewController: UITableViewController {
     }
     var scoreThisWeek: Int! {
         var tempScore = 0
-        for eachUserScore in teamMemberScores {
-            tempScore += (teamMemberScores[eachUserScore.key]?.scoreThisWeek)!
+        for eachMember in teamMembers {
+            tempScore += eachMember.getValueScoreForThisWeek()
         }
         return tempScore
     }
@@ -71,8 +58,8 @@ class TeamProfileTableViewController: UITableViewController {
     }
     var numberOfSubmissions: Int! {
         var numSubs = 0
-        for eachMember in teamMemberScores {
-            if eachMember.value.submitted { numSubs += 1 }
+        for eachMember in teamMembers {
+            if eachMember.getValueDidSubmitToday() { numSubs += 1 }
         }
         return numSubs
     }
@@ -81,30 +68,24 @@ class TeamProfileTableViewController: UITableViewController {
         super.viewDidLoad()
         
         addFirebaseObservers()
-        
-        initializeRadialViews()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        initializeRadialViews()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        updateRadialViews()
+        updateUIElements()
     }
     
     // UI Functions
     
     func updateUIElements() {
-        updateLabels()
-        self.tableView.reloadData()
-    }
-    
-    func updateLabels() {
         nameLabel.text = "Team \((activeTeam?.teamName)!)"
         updateRadialLabels()
+        updateRadialViews()
     }
     
     func updateRadialLabels() {
@@ -112,22 +93,32 @@ class TeamProfileTableViewController: UITableViewController {
         rankBottomLabel.text = "7 teams"
         
         submissionsTopLabel.text = "\(numberOfSubmissions!)"
-        submissionsBottomLabel.text = "\(teamMemberScores.count) reports"
+        submissionsBottomLabel.text = "\(teamMembers.count) reports"
         
         scoreTopLabel.text = "\(scoreThisWeek!)"
         scoreBottomLabel.text = "\(potentialScoreThisWeek!) pts"
     }
     
     func updateRadialViews() {
-        rankRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.58)
-        submissionsRadialView.setValueAnimated(duration: 1.0, newProgressValue:
-            CGFloat(numberOfSubmissions) / CGFloat(teamMemberScores.count))
-        scoreRadialView.setValueAnimated(duration: 1.0, newProgressValue:
-            CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek))
+        let rankProgress: CGFloat = 0.58
+        let submissionsProgress: CGFloat = CGFloat(numberOfSubmissions) / CGFloat(teamMembers.count)
+        let scoreProgress: CGFloat = CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek)
+        
+        if rankRadialView.targetProgress != rankProgress {
+            rankRadialView.targetProgress = rankProgress
+            rankRadialView.setValueAnimated(duration: 1.0, newProgressValue: rankProgress)
+        }
+        if submissionsRadialView.targetProgress != submissionsProgress {
+            submissionsRadialView.targetProgress = submissionsProgress
+            submissionsRadialView.setValueAnimated(duration: 1.0, newProgressValue: submissionsProgress)
+        }
+        if scoreRadialView.targetProgress != scoreProgress {
+            scoreRadialView.targetProgress = scoreProgress
+            scoreRadialView.setValueAnimated(duration: 1.0, newProgressValue: scoreProgress)
+        }
     }
     
     func initializeRadialViews() {
-        // Called once when view loads
         rankRadialView.progressStroke = rankTopLabel.textColor
         rankRadialView.createCircles()
         submissionsRadialView.progressStroke = submissionsTopLabel.textColor
@@ -149,36 +140,37 @@ class TeamProfileTableViewController: UITableViewController {
         let teamMembersRef = databaseRef.child("teamMembers").child((activeTeamId)!)
         teamMembersRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
-                self.activeTeam?.members = self.loadTeamMembers(with: snapshot)!
-                self.updateUIElements()
+                if let _ = self.activeTeam {
+                    self.teamMembers = self.loadTeamMembers(with: snapshot)!
+                    self.updateUIElements()
+                }
             }
         })
         let teamScoresRef = databaseRef.child("teamScores").child((activeTeamId)!)
         teamScoresRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
-                self.teamMemberScores = self.loadUserScores(with: snapshot)
+                self.loadTeamScores(with: snapshot)
                 self.addSubmissionObservers()
-                self.updateUIElements()
             }
         })
     }
     
     func addSubmissionObservers() {
-        for eachMember in teamMemberScores {
+        for eachMember in teamMembers{
             let memberSubmissionRef =
                 databaseRef.child("reports").child(
                     "Year-\(currentYear!)").child(
                         "Week-\(weekNumberToday!)").child(
-                            eachMember.key).child(
+                            eachMember.id).child(
                                 "Day-\(dayNumberToday!)")
             memberSubmissionRef.observe(.value, with: { snapshot in
                 if let _ = snapshot.value {
-                    self.teamMemberScores[eachMember.key]?.submitted = self.checkUserSubmission(with: snapshot)
+                    eachMember.setValueDidSubmitToday(with: self.checkUserSubmission(with: snapshot))
+                    self.updateUIElements()
+                    self.tableView.reloadData()
                 } else {
-                    self.teamMemberScores[eachMember.key]?.submitted = false
+                    eachMember.setValueDidSubmitToday(with: false)
                 }
-                self.updateUIElements()
-                self.tableView.reloadData()
             })
         }
     }
@@ -199,24 +191,41 @@ class TeamProfileTableViewController: UITableViewController {
         }
     }
     
-    func loadTeamMembers(with snapshot: DataSnapshot) -> [String: String]? {
+    func loadTeamMembers(with snapshot: DataSnapshot) -> [TeamMember]? {
+        var newMembers = [TeamMember]()
         if let teamMembersDict = snapshot.value as? [String: String] {
-            return teamMembersDict
+            self.activeTeam!.members = teamMembersDict
+            for eachMemberName in teamMembersDict {
+                newMembers.append(TeamMember(name: eachMemberName.value, id: eachMemberName.key))
+            }
+            return newMembers
         } else {
             return nil
         }
     }
     
-    func loadUserScores(with snapshot: DataSnapshot) -> [String: UserScore] {
-        teamMemberArray = [UserScore]()
-        var loadedUserScores = [String: UserScore]()
+    func loadTeamScores(with snapshot: DataSnapshot) {
         if let userScoresDict = snapshot.value as? [String: String] {
             for eachUser in userScoresDict {
-                loadedUserScores[eachUser.key] = (UserScore(id: eachUser.key, score: Int(eachUser.value)!))
-                teamMemberArray.append(UserScore(id: eachUser.key, score: Int(eachUser.value)!))
+                if let _ = activeTeam {
+                    for eachMember in teamMembers {
+                        if eachMember.id == eachUser.key {
+                            eachMember.setValueScoreForThisWeek(with: Int(eachUser.value)!)
+                        }
+                    }
+                }
             }
         }
-        return loadedUserScores
+    }
+    
+    func shouldUpdateUIElements() -> Bool {
+        var willUpdate = false
+        for eachMember in teamMembers {
+            if eachMember.shouldUpdateRadialViews() {
+                willUpdate = true
+            }
+        }
+        return willUpdate
     }
     
     // Segue Control
@@ -245,21 +254,22 @@ class TeamProfileTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // THIS FUNCTION VERY BUGGY
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemberCell")!
         if indexPath.row < (activeTeam?.members.count)! {
-            if teamMemberArray.count == activeTeam?.members.count {
-                let member = teamMemberArray[indexPath.row]
-                let name = activeTeam?.members[member.id]
-                cell.textLabel?.text = name
-                if member.submitted {
-                    cell.detailTextLabel?.text = "Remind"
-                    cell.detailTextLabel?.textColor = rankTopLabel.textColor
-                    cell.accessoryType = .none
-                } else {
-                    cell.detailTextLabel?.text = "Submitted"
-                    cell.detailTextLabel?.textColor = UIColor.lightGray
-                    cell.accessoryType = .checkmark
+            if let _ = activeTeam {
+                if teamMembers.count == activeTeam!.members.count {
+                    let member = teamMembers[indexPath.row]
+                    let name = member.name
+                    cell.textLabel?.text = name
+                    if member.getValueDidSubmitToday() {
+                        cell.detailTextLabel?.text = "Submitted"
+                        cell.detailTextLabel?.textColor = UIColor.lightGray
+                        cell.accessoryType = .checkmark
+                    } else {
+                        cell.detailTextLabel?.text = "Remind"
+                        cell.detailTextLabel?.textColor = rankTopLabel.textColor
+                        cell.accessoryType = .none
+                    }
                 }
             }
         }
