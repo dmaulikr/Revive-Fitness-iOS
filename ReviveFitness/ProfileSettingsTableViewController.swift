@@ -36,6 +36,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     @IBOutlet weak var datePickerCell: UITableViewCell!
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBOutlet weak var birthdateLabel: UILabel!
+    @IBOutlet weak var lbsAndPercentageLabel: UILabel!
     
     @IBAction func saveButton() {
         save()
@@ -48,7 +49,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        phoneTextField.delegate = self
+        setTextFieldDelegates()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -59,6 +60,19 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         }
         
         setInitialValues()
+    }
+    
+    func setTextFieldDelegates() {
+        firstNameTextField.delegate = self
+        lastNameTextField.delegate = self
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        phoneTextField.delegate = self
+        startingWeightTextField.delegate = self
+        bodyFatTextField.delegate = self
+        oldHabitTextField.delegate = self
+        newHabitTextField.delegate = self
+        fitnessGoalTextField.delegate = self
     }
     
     func save() {
@@ -98,6 +112,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         oldHabitTextField.textColor = enabledColor
         newHabitTextField.textColor = enabledColor
         fitnessGoalTextField.textColor = enabledColor
+        lbsAndPercentageLabel.textColor = enabledColor
     }
     
     func setInitialValues() {
@@ -339,19 +354,103 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         } else if (textField == self.bodyFatTextField) || (textField == self.startingWeightTextField) {
             let allowedCharacters = CharacterSet.decimalDigits
             let characterSet = CharacterSet(charactersIn: string)
+            if textField == self.bodyFatTextField {
+                let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
+                if newString.characters.count > 2 {
+                    return false
+                }
+            } else if textField == self.startingWeightTextField {
+                let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
+                if newString.characters.count > 3 {
+                    return false
+                }
+            }
             return allowedCharacters.isSuperset(of: characterSet)
         // Restricts length of password field to 12 characters
         } else if textField == self.passwordTextField {
             let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
-            return !(newString.characters.count > 12)
+            return !(newString.characters.contains(" ") || newString.characters.count > 12)
         // Restricts length of other text fields to 50 characters
         } else if (textField == self.firstNameTextField) || (textField == self.lastNameTextField) ||
                   (textField == self.emailTextField) || (textField == self.oldHabitTextField) ||
                   (textField == self.newHabitTextField) || (textField == self.fitnessGoalTextField){
             let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
-            return !(newString.characters.count > 50)
+            return newString.characters.count <= 50
         } else {
             return true
         }
+    }
+    
+    func findErrors() -> [String] {
+        var errors = [String]()
+        
+        if emailTextField.hasText {
+            let emailRegEx = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}"
+            do {
+                let regex = try NSRegularExpression(pattern: emailRegEx)
+                let nsString = emailTextField.text! as NSString
+                let results = regex.matches(in: emailTextField.text!, range: NSRange(location: 0, length: nsString.length))
+                if results.count == 0 {
+                    errors.append("\n- Enter a valid email address")
+                }
+            } catch _ as NSError {
+                errors.append("\n- Enter a valid email address")
+            }
+        } else {
+            errors.append("\n- Enter an email address")
+        }
+        
+        if passwordTextField.hasText {
+            if (passwordTextField.text!.characters.count < 6 || passwordTextField.text!.characters.count > 20) {
+                errors.append("\n- Password must be 6-20 characters long")
+            }
+            if passwordTextField.text!.characters.contains(" ") {
+                errors.append("\n- Password cannot contain spaces")
+            }
+        } else {
+            errors.append("\n- Enter a valid password")
+        }
+        
+        if !firstNameTextField.hasText {
+            errors.append("\n- Enter a first name")
+        }
+        if !lastNameTextField.hasText {
+            errors.append("\n- Enter a last name")
+        }
+        if !phoneTextField.hasText {
+            errors.append("\n- Enter a phone number")
+        }
+        if let text = birthdateLabel.text {
+            if text.characters.count == 0 {
+                errors.append("\n- Select a birthdate")
+            }
+        } else {
+            errors.append("\n- Select a birthdate")
+        }
+        if startingWeightTextField.hasText {
+            if Int(startingWeightTextField.text!)! <= 0 {
+                errors.append("\n- Initial weight must be greater than 0")
+            }
+        } else {
+            errors.append("\n- Enter an initial weight")
+        }
+        if bodyFatTextField.hasText {
+            if Int(bodyFatTextField.text!)! <= 0 {
+                errors.append("\n- Body fat % must be greater than 0")
+            }
+        } else {
+            errors.append("\n- Enter a body fat %")
+        }
+        if !oldHabitTextField.hasText {
+            errors.append("\n- Enter an old habit")
+        }
+        if !newHabitTextField.hasText {
+            errors.append("\n- Enter a new habit")
+        }
+        if !fitnessGoalTextField.hasText {
+            errors.append("\n- Enter a fitness goal")
+        }
+        
+        return errors
     }
 }
