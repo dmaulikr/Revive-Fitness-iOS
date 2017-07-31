@@ -9,7 +9,7 @@ protocol ProfileSettingsTableViewControllerDelegate: class {
                                    didFinishWith updatedUser: User)
 }
 
-class ProfileSettingsTableViewController: UITableViewController {
+class ProfileSettingsTableViewController: UITableViewController, UITextFieldDelegate {
     
     var firstTimeSettings = false
     
@@ -47,6 +47,8 @@ class ProfileSettingsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        phoneTextField.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -89,6 +91,13 @@ class ProfileSettingsTableViewController: UITableViewController {
         newHabitTextField.isEnabled = true
         fitnessGoalTextField.isEnabled = true
         phoneTextField.returnKeyType = .next
+        
+        let enabledColor = emailTextField.textColor!
+        startingWeightTextField.textColor = enabledColor
+        bodyFatTextField.textColor = enabledColor
+        oldHabitTextField.textColor = enabledColor
+        newHabitTextField.textColor = enabledColor
+        fitnessGoalTextField.textColor = enabledColor
     }
     
     func setInitialValues() {
@@ -283,5 +292,66 @@ class ProfileSettingsTableViewController: UITableViewController {
             newIndexPath = IndexPath(row: 0, section: indexPath.section)
         }
         return super.tableView(tableView, indentationLevelForRowAt: newIndexPath)
+    }
+    
+    // Validations
+    
+    func textField(_ textField: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool {
+        
+        // Formats phone text field with ( ) -
+        if (textField == self.phoneTextField){
+            let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
+            let components = newString.components(separatedBy: NSCharacterSet.decimalDigits.inverted)
+            
+            let decimalString = components.joined(separator: "") as NSString
+            let length = decimalString.length
+            let hasLeadingOne = length > 0 && decimalString.character(at: 0) == (1 as unichar)
+            
+            if length == 0 || (length > 10 && !hasLeadingOne) || length > 11 {
+                let newLength = (textField.text! as NSString).length + (string as NSString).length - range.length as Int
+                
+                return (newLength > 10) ? false : true
+            }
+            var index = 0 as Int
+            let formattedString = NSMutableString()
+            
+            if hasLeadingOne {
+                formattedString.append("1 ")
+                index += 1
+            }
+            if (length - index) > 3 {
+                let areaCode = decimalString.substring(with: NSMakeRange(index, 3))
+                formattedString.appendFormat("(%@) ", areaCode)
+                index += 3
+            }
+            if length - index > 3 {
+                let prefix = decimalString.substring(with: NSMakeRange(index, 3))
+                formattedString.appendFormat("%@ - ", prefix)
+                index += 3
+            }
+            let remainder = decimalString.substring(from: index)
+            formattedString.append(remainder)
+            textField.text = formattedString as String
+            return false
+        // Formats text to accept only integers
+        } else if (textField == self.bodyFatTextField) || (textField == self.startingWeightTextField) {
+            let allowedCharacters = CharacterSet.decimalDigits
+            let characterSet = CharacterSet(charactersIn: string)
+            return allowedCharacters.isSuperset(of: characterSet)
+        // Restricts length of password field to 12 characters
+        } else if textField == self.passwordTextField {
+            let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
+            return !(newString.characters.count > 12)
+        // Restricts length of other text fields to 50 characters
+        } else if (textField == self.firstNameTextField) || (textField == self.lastNameTextField) ||
+                  (textField == self.emailTextField) || (textField == self.oldHabitTextField) ||
+                  (textField == self.newHabitTextField) || (textField == self.fitnessGoalTextField){
+            let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
+            return !(newString.characters.count > 50)
+        } else {
+            return true
+        }
     }
 }
