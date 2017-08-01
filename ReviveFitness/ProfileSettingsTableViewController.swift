@@ -80,6 +80,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     func save() {
         let errors = findErrors()
         if errors.count == 0 {
+            tableView.endEditing(true)
             saveChangesToFirebase()
             updateUserInstance()
             if let _ = delegate {
@@ -150,7 +151,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                                        "password": passwordTextField.text!,
                                        "id": activeUser.id,
                                        "week": "\(activeUser.weekNumber!)"])
-        updateUserDataRef.setValue(["phone": phoneTextField.text!,
+        updateUserDataRef.updateChildValues(["phone": phoneTextField.text!,
                                     "birth": birthdateLabel.text!,
                                     "startWeight": startingWeightTextField.text!,
                                     "targetWeight": targetWeightTextField.text!,
@@ -158,7 +159,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                                     "oldHabit": oldHabitTextField.text!,
                                     "newHabit": newHabitTextField.text!,
                                     "fitnessGoal": fitnessGoalTextField.text!,
-                                    "team": activeUser.teamId])
+                                    "team": activeUser!.teamId!])
     }
     
     func updateUserInstance() {
