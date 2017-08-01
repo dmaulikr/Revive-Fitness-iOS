@@ -15,6 +15,7 @@ class User: NSObject {
     var birthdate: String?
     var startWeight: Int?
     var currentWeight: Int?
+    var targetWeight: Int?
     var startBodyFat: Int?
     var currentBodyFat: Int?
     var oldHabit: String?
@@ -48,6 +49,7 @@ class User: NSObject {
         self.birthdate = dict["birth"]!
         self.phone = dict["phone"]!
         self.startWeight = Int(dict["startWeight"]!)
+        self.targetWeight = Int(dict["targetWeight"]!)
         self.startBodyFat = Int(dict["startBodyFat"]!)
         if let currentWeight = dict["currentWeight"] {
             self.currentWeight = Int(currentWeight)

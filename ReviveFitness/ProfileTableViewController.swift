@@ -80,6 +80,36 @@ ProfileSettingsTableViewControllerDelegate {
         }
     }
     
+    var currentWeightGoalProgressPercentage: CGFloat! {
+        if let _ = activeUser?.currentWeight {
+            let changeInWeight = CGFloat((activeUser?.targetWeight)! - (activeUser?.startWeight)!)
+            let progressSoFar = CGFloat((activeUser?.targetWeight)! - (activeUser?.currentWeight)!)
+            return progressSoFar / changeInWeight
+        } else if (activeUser?.targetWeight)! == (activeUser?.startWeight)! {
+            return 1.0
+        } else {
+            return 0.0
+        }
+    }
+    
+    var weightGoalProgress: Int! {
+        if let _ = activeUser?.currentWeight {
+            return abs((activeUser?.targetWeight)! - (activeUser?.currentWeight)!)
+        } else {
+            return 0
+        }
+    }
+    
+    var weightGoalType: String! {
+        if (activeUser?.targetWeight)! > (activeUser?.startWeight)! {
+            return "lbs gained"
+        } else if (activeUser?.targetWeight)! < (activeUser?.startWeight)! {
+            return "lbs lost"
+        } else {
+            return "lbs off"
+        }
+    }
+    
     @IBAction func settingsButtonTapped() {
         performSegue(withIdentifier: "EditProfile", sender: self)
     }
@@ -206,6 +236,9 @@ ProfileSettingsTableViewControllerDelegate {
 
         weekTopLabel.text = "\(scoreThisWeek!)"
         weekBottomLabel.text = "\(potentialScoreThisWeek!) pts"
+        
+        goalTopLabel.text = "\(Int(currentWeightGoalProgressPercentage * 100.0))%"
+        goalBottomLabel.text = "\(weightGoalProgress!) \(weightGoalType!)"
     }
     
     func updateWeeklyReportButton() {
@@ -225,7 +258,7 @@ ProfileSettingsTableViewControllerDelegate {
         weekRadialView.setValueAnimated(duration: 1.0, newProgressValue:
             CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek))
         
-        goalRadialView.setValueAnimated(duration: 1.0, newProgressValue: 0.50)
+        goalRadialView.setValueAnimated(duration: 1.0, newProgressValue: currentWeightGoalProgressPercentage)
     }
     
     // Segue Control

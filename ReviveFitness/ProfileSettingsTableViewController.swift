@@ -28,6 +28,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var phoneTextField: UITextField!
     @IBOutlet weak var startingWeightTextField: UITextField!
+    @IBOutlet weak var targetWeightTextField: UITextField!
     @IBOutlet weak var bodyFatTextField: UITextField!
     @IBOutlet weak var oldHabitTextField: UITextField!
     @IBOutlet weak var newHabitTextField: UITextField!
@@ -60,6 +61,17 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         }
         
         setInitialValues()
+        
+        let dismissTap = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+        dismissTap.numberOfTapsRequired = 1
+        view.addGestureRecognizer(dismissTap)
+    }
+    
+    func dismissKeyboard(recognizer: UITapGestureRecognizer) {
+        view.endEditing(true)
+        if datePickerVisible {
+            hideDatePicker()
+        }
     }
     
     func setTextFieldDelegates() {
@@ -69,6 +81,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         passwordTextField.delegate = self
         phoneTextField.delegate = self
         startingWeightTextField.delegate = self
+        targetWeightTextField.delegate = self
         bodyFatTextField.delegate = self
         oldHabitTextField.delegate = self
         newHabitTextField.delegate = self
@@ -76,7 +89,8 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     }
     
     func save() {
-        if fieldsFilled() {
+        let errors = findErrors()
+        if errors.count == 0 {
             saveChangesToFirebase()
             updateUserInstance()
             if let _ = delegate {
@@ -85,7 +99,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                 dismiss(animated: true, completion: nil)
             }
         } else {
-            displayError()
+            displayAlert(with: errors)
         }
     }
     
@@ -100,6 +114,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     func enableFirstTimeFields() {
         cancelBarButton.isEnabled = false
         startingWeightTextField.isEnabled = true
+        targetWeightTextField.isEnabled = true
         bodyFatTextField.isEnabled = true
         oldHabitTextField.isEnabled = true
         newHabitTextField.isEnabled = true
@@ -108,6 +123,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         
         let enabledColor = emailTextField.textColor!
         startingWeightTextField.textColor = enabledColor
+        targetWeightTextField.textColor = enabledColor
         bodyFatTextField.textColor = enabledColor
         oldHabitTextField.textColor = enabledColor
         newHabitTextField.textColor = enabledColor
@@ -125,21 +141,15 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         if let _ = activeUser.startWeight {
             startingWeightTextField.text = "\(activeUser.startWeight!)"
         }
+        if let _ = activeUser.targetWeight {
+            targetWeightTextField.text = "\(activeUser.targetWeight!)"
+        }
         if let _ = activeUser.startBodyFat {
             bodyFatTextField.text = "\(activeUser.startBodyFat!)"
         }
         oldHabitTextField.text = activeUser.oldHabit
         newHabitTextField.text = activeUser.newHabit
         fitnessGoalTextField.text = activeUser.fitnessGoal
-    }
-    
-    func fieldsFilled() -> Bool {
-        return (firstNameTextField.hasText && lastNameTextField.hasText &&
-        emailTextField.hasText && passwordTextField.hasText &&
-        phoneTextField.hasText && birthdateLabel.text != "" &&
-        startingWeightTextField.hasText && bodyFatTextField.hasText &&
-        oldHabitTextField.hasText && newHabitTextField.hasText &&
-        fitnessGoalTextField.hasText)
     }
     
     func saveChangesToFirebase() {
@@ -154,6 +164,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         updateUserDataRef.setValue(["phone": phoneTextField.text!,
                                     "birth": birthdateLabel.text!,
                                     "startWeight": startingWeightTextField.text!,
+                                    "targetWeight": targetWeightTextField.text!,
                                     "startBodyFat": bodyFatTextField.text!,
                                     "oldHabit": oldHabitTextField.text!,
                                     "newHabit": newHabitTextField.text!,
@@ -169,18 +180,22 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         activeUser.birthdate = birthdateLabel.text
         activeUser.phone = phoneTextField.text
         activeUser.startWeight = Int(startingWeightTextField.text!)
+        activeUser.targetWeight = Int(targetWeightTextField.text!)
         activeUser.startBodyFat = Int(bodyFatTextField.text!)
         activeUser.oldHabit = oldHabitTextField.text
         activeUser.newHabit = newHabitTextField.text
         activeUser.fitnessGoal = fitnessGoalTextField.text
     }
     
-    func displayError() {
-        let alert = UIAlertController(title: "Fields Required",
-                                      message: "Each field is required - please check that you entered all information. Thanks!",
+    func displayAlert(with errors: [String]) {
+        var message = "Please be sure you do the following:"
+        for eachError in errors {
+            message += eachError
+        }
+        let alert = UIAlertController(title: "Unable to Save Settings",
+                                      message: message,
                                       preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        
         alert.addAction(action)
         present(alert, animated: true)
     }
@@ -198,6 +213,8 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
             phoneTextField.resignFirstResponder()
             showDatePicker()
         } else if sender == startingWeightTextField {
+            targetWeightTextField.becomeFirstResponder()
+        } else if sender == targetWeightTextField {
             bodyFatTextField.becomeFirstResponder()
         } else if sender == bodyFatTextField {
             oldHabitTextField.becomeFirstResponder()
@@ -290,12 +307,34 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         tableView.resignFirstResponder()
+        view.endEditing(true)
         
         if indexPath.section == 1 && indexPath.row == 3 {
             if datePickerVisible {
                 hideDatePicker()
             } else {
                 showDatePicker()
+            }
+        } else {
+            hideDatePicker()
+        }
+        
+        if indexPath.section == 0 {
+            switch indexPath.row {
+            case 0: firstNameTextField.becomeFirstResponder()
+            case 1: lastNameTextField.becomeFirstResponder()
+            case 2: phoneTextField.becomeFirstResponder()
+            default: break
+            }
+        } else if indexPath.section == 1 {
+            switch indexPath.row {
+            case 0: startingWeightTextField.becomeFirstResponder()
+            case 1: targetWeightTextField.becomeFirstResponder()
+            case 2: bodyFatTextField.becomeFirstResponder()
+            case 3: oldHabitTextField.becomeFirstResponder()
+            case 4: newHabitTextField.becomeFirstResponder()
+            case 5: fitnessGoalTextField.becomeFirstResponder()
+            default: break
             }
         }
     }
@@ -351,7 +390,8 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
             textField.text = formattedString as String
             return false
         // Formats text to accept only integers
-        } else if (textField == self.bodyFatTextField) || (textField == self.startingWeightTextField) {
+        } else if (textField == self.bodyFatTextField) || (textField == self.startingWeightTextField) ||
+                    (textField == self.targetWeightTextField){
             let allowedCharacters = CharacterSet.decimalDigits
             let characterSet = CharacterSet(charactersIn: string)
             if textField == self.bodyFatTextField {
@@ -359,7 +399,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                 if newString.characters.count > 2 {
                     return false
                 }
-            } else if textField == self.startingWeightTextField {
+            } else if (textField == self.startingWeightTextField) || (textField == self.targetWeightTextField) {
                 let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
                 if newString.characters.count > 3 {
                     return false
@@ -410,7 +450,6 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         } else {
             errors.append("\n- Enter a valid password")
         }
-        
         if !firstNameTextField.hasText {
             errors.append("\n- Enter a first name")
         }
@@ -433,6 +472,13 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
             }
         } else {
             errors.append("\n- Enter an initial weight")
+        }
+        if targetWeightTextField.hasText {
+            if Int(targetWeightTextField.text!)! <= 0 {
+                errors.append("\n- Target weight must be greater than 0")
+            }
+        } else {
+            errors.append("\n- Enter a target weight")
         }
         if bodyFatTextField.hasText {
             if Int(bodyFatTextField.text!)! <= 0 {
