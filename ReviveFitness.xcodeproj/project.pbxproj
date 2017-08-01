@@ -18,6 +18,7 @@
 		B67CC3851F041EF100B69C93 /* ProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */; };
 		B67CC3871F056D9C00B69C93 /* ReportTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */; };
 		B67CC3891F0697E700B69C93 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3881F0697E700B69C93 /* Report.swift */; };
+		B69B0D481F3046EA00537BEA /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D471F3046EA00537BEA /* Functions.swift */; };
 		B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */; };
 		B6A561771F196A2100F1A0C7 /* WeeklyReportTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */; };
 		B6A561791F196D3200F1A0C7 /* WeeklyReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */; };
@@ -43,6 +44,7 @@
 		B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileTableViewController.swift; sourceTree = "<group>"; };
 		B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportTableViewController.swift; sourceTree = "<group>"; };
 		B67CC3881F0697E700B69C93 /* Report.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		B69B0D471F3046EA00537BEA /* Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
 		B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeeklyReportTableViewController.swift; sourceTree = "<group>"; };
 		B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeeklyReport.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				B666338E1F0337A100AD5966 /* AppDelegate.swift */,
+				B69B0D471F3046EA00537BEA /* Functions.swift */,
 				B66633A21F0356D300AD5966 /* User.swift */,
 				B67CC3881F0697E700B69C93 /* Report.swift */,
 				B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */,
@@ -260,6 +263,7 @@
 				B67CC3851F041EF100B69C93 /* ProfileTableViewController.swift in Sources */,
 				B6AD0E911F2BF5320091350A /* PickTeamTableViewController.swift in Sources */,
 				B6A561791F196D3200F1A0C7 /* WeeklyReport.swift in Sources */,
+				B69B0D481F3046EA00537BEA /* Functions.swift in Sources */,
 				B6AD0E931F2BF5460091350A /* TeamProfileTableViewController.swift in Sources */,
 				B666338F1F0337A100AD5966 /* AppDelegate.swift in Sources */,
 				B6A561771F196A2100F1A0C7 /* WeeklyReportTableViewController.swift in Sources */,

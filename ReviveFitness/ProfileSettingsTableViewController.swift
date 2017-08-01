@@ -61,17 +61,6 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         }
         
         setInitialValues()
-        
-        let dismissTap = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
-        dismissTap.numberOfTapsRequired = 1
-        view.addGestureRecognizer(dismissTap)
-    }
-    
-    func dismissKeyboard(recognizer: UITapGestureRecognizer) {
-        view.endEditing(true)
-        if datePickerVisible {
-            hideDatePicker()
-        }
     }
     
     func setTextFieldDelegates() {
@@ -316,7 +305,9 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                 showDatePicker()
             }
         } else {
-            hideDatePicker()
+            if datePickerVisible {
+                hideDatePicker()
+            }
         }
         
         if indexPath.section == 0 {
