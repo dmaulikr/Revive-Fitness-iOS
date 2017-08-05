@@ -21,6 +21,9 @@ ProfileSettingsTableViewControllerDelegate {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var weeklyReportButton: UIButton!
     
+    @IBOutlet weak var graphView: DataPointGraphView!
+    @IBOutlet weak var colorKeyLabel: UILabel!
+    
     @IBOutlet weak var goalRadialView: RadialProgressView!
     @IBOutlet weak var weekRadialView: RadialProgressView!
     @IBOutlet weak var todayRadialView: RadialProgressView!
@@ -133,18 +136,22 @@ ProfileSettingsTableViewControllerDelegate {
         weekRadialView.createCircles()
         todayRadialView.progressStroke = todayTopLabel.textColor
         todayRadialView.createCircles()
+        
+        colorizeColorKeyLabel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         updateUIElements()
+        graphView.initializeGraph()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         updateRadialViews()
+        updateGraphView()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -264,6 +271,28 @@ ProfileSettingsTableViewControllerDelegate {
             CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek))
         
         goalRadialView.setValueAnimated(duration: 1.0, newProgressValue: currentWeightGoalProgressPercentage)
+    }
+    
+    func updateGraphView() {
+        /*var tempDataArray = [50, 50, 50, 50, 50, 50, 50]
+        for eachReport in reports {
+            tempDataArray[eachReport!.submissionDay - 1] = eachReport!.score
+        }
+        graphView.dataToGraph = tempDataArray*/
+        graphView.animateDataLines(withDuration: 0.4)
+        graphView.animateDataPoints(withDuration: 0.4)
+    }
+    
+    func colorizeColorKeyLabel() {
+        colorKeyLabel.textColor = UIColor.lightGray
+        let colorKeyString = NSMutableAttributedString(
+            string: "Points this week versus your historical average",
+            attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14.0, weight: UIFontWeightUltraLight)])
+        colorKeyString.addAttribute(
+            NSForegroundColorAttributeName, value: goalTopLabel.textColor, range: NSRange(location: 7,length: 10))
+        colorKeyString.addAttribute(
+            NSForegroundColorAttributeName, value: UIColor.darkGray, range: NSRange(location: 29,length: 18))
+        colorKeyLabel.attributedText = colorKeyString
     }
     
     // Segue Control

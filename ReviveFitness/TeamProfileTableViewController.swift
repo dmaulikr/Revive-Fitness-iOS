@@ -4,6 +4,9 @@ import FirebaseDatabase
 
 class TeamProfileTableViewController: UITableViewController {
     
+    let primaryDataColor = UIColor(red: 255.0 / 255.0, green: 21.0 / 255.0, blue: 0.0 / 255.0, alpha: 1.0)
+    let primaryLineColor = UIColor(red: 255.0 / 255.0, green: 21.0 / 255.0, blue: 0.0 / 255.0, alpha: 0.5)
+    
     var databaseRef: DatabaseReference!
     var activeTeamId: String?
     var activeTeam: Team?
@@ -13,6 +16,9 @@ class TeamProfileTableViewController: UITableViewController {
     var didWaitForViewToAppear = false
     
     @IBOutlet weak var nameLabel: UILabel!
+    
+    @IBOutlet weak var colorKeyLabel: UILabel!
+    @IBOutlet weak var graphView: DataPointGraphView!
     
     @IBOutlet weak var rankRadialView: RadialProgressView!
     @IBOutlet weak var submissionsRadialView: RadialProgressView!
@@ -79,11 +85,15 @@ class TeamProfileTableViewController: UITableViewController {
         super.viewDidLoad()
         
         addFirebaseObservers()
+        colorizeColorKeyLabel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         initializeRadialViews()
+        graphView.primaryDataColor = self.primaryDataColor
+        graphView.primaryLineColor = self.primaryLineColor
+        graphView.initializeGraph()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -104,6 +114,7 @@ class TeamProfileTableViewController: UITableViewController {
         updateRadialLabels()
         if didWaitForViewToAppear {
             updateRadialViews()
+            updateGraphView()
         }
     }
     
@@ -157,6 +168,23 @@ class TeamProfileTableViewController: UITableViewController {
         submissionsRadialView.createCircles()
         scoreRadialView.progressStroke = scoreTopLabel.textColor
         scoreRadialView.createCircles()
+    }
+    
+    func updateGraphView() {
+        graphView.animateDataLines(withDuration: 0.4)
+        graphView.animateDataPoints(withDuration: 0.4)
+    }
+    
+    func colorizeColorKeyLabel() {
+        colorKeyLabel.textColor = UIColor.lightGray
+        let colorKeyString = NSMutableAttributedString(
+            string: "Points this week versus your historical average",
+            attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14.0, weight: UIFontWeightUltraLight)])
+        colorKeyString.addAttribute(
+            NSForegroundColorAttributeName, value: rankTopLabel.textColor, range: NSRange(location: 7,length: 10))
+        colorKeyString.addAttribute(
+            NSForegroundColorAttributeName, value: UIColor.darkGray, range: NSRange(location: 29,length: 18))
+        colorKeyLabel.attributedText = colorKeyString
     }
 
     // Firebase functions

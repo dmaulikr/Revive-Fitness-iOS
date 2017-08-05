@@ -19,6 +19,7 @@
 		B67CC3871F056D9C00B69C93 /* ReportTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */; };
 		B67CC3891F0697E700B69C93 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3881F0697E700B69C93 /* Report.swift */; };
 		B69B0D481F3046EA00537BEA /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D471F3046EA00537BEA /* Functions.swift */; };
+		B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */; };
 		B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */; };
 		B6A561771F196A2100F1A0C7 /* WeeklyReportTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */; };
 		B6A561791F196D3200F1A0C7 /* WeeklyReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */; };
@@ -45,6 +46,7 @@
 		B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportTableViewController.swift; sourceTree = "<group>"; };
 		B67CC3881F0697E700B69C93 /* Report.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		B69B0D471F3046EA00537BEA /* Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
+		B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataPointGraphView.swift; sourceTree = "<group>"; };
 		B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
 		B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeeklyReportTableViewController.swift; sourceTree = "<group>"; };
 		B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeeklyReport.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */,
 				B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */,
 				B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */,
+				B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */,
 				B66633921F0337A100AD5966 /* Main.storyboard */,
 				B66633951F0337A100AD5966 /* Assets.xcassets */,
 				B66633971F0337A100AD5966 /* LaunchScreen.storyboard */,
@@ -259,6 +262,7 @@
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
 				B6AD0E951F2BF8C60091350A /* Team.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,
+				B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */,
 				B6AD0E971F2E1DB50091350A /* TeamMember.swift in Sources */,
 				B67CC3851F041EF100B69C93 /* ProfileTableViewController.swift in Sources */,
 				B6AD0E911F2BF5320091350A /* PickTeamTableViewController.swift in Sources */,

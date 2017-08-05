@@ -1339,11 +1339,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="jge-Ki-Eht">
-                            <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="365"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5E3-gA-3mz">
-                                    <rect key="frame" x="210" y="43" width="90" height="115"/>
+                                    <rect key="frame" x="210" y="51" width="90" height="115"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEr-bV-EHN" customClass="RadialProgressView" customModule="ReviveFitness" customModuleProvider="target">
@@ -1393,7 +1393,7 @@
                                     </subviews>
                                 </view>
                                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="avH-uI-qc3">
-                                    <rect key="frame" x="20" y="43" width="90" height="115"/>
+                                    <rect key="frame" x="20" y="51" width="90" height="115"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S23-FB-Qsg" customClass="RadialProgressView" customModule="ReviveFitness" customModuleProvider="target">
@@ -1432,7 +1432,7 @@
                                     </subviews>
                                 </view>
                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YgX-Co-IUN">
-                                    <rect key="frame" x="20" y="182" width="288" height="30"/>
+                                    <rect key="frame" x="16" y="335" width="288" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="ADD WEEKLY REPORT">
                                         <color key="titleColor" red="0.81595222300000003" green="0.52967108760000003" blue="0.8162079632" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1442,23 +1442,16 @@
                                     </connections>
                                 </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Hello, Dominic" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TgW-Hw-sM8">
-                                    <rect key="frame" x="20" y="8" width="280" height="28"/>
+                                    <rect key="frame" x="20" y="11" width="280" height="28"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" weight="thin" pointSize="20"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WVA-wr-3ei">
-                                    <rect key="frame" x="115" y="43" width="90" height="115"/>
+                                    <rect key="frame" x="115" y="51" width="90" height="115"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="This Week" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wh3-qj-jxy">
-                                            <rect key="frame" x="0.0" y="4" width="82" height="21"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
                                         <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gFK-RY-Vpp" customClass="RadialProgressView" customModule="ReviveFitness" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="25" width="90" height="90"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1485,14 +1478,40 @@
                                             </subviews>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="This Week" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wh3-qj-jxy">
+                                            <rect key="frame" x="4" y="4" width="82" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
+                                </view>
+                                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mXL-LP-y5f" customClass="DataPointGraphView" customModule="ReviveFitness" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="181" width="320" height="162"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Color key label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GRX-YK-R9Z">
+                                            <rect key="frame" x="8" y="8" width="304" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V7l-2N-4iz">
+                                            <rect key="frame" x="12" y="0.0" width="296" height="1"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </view>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ReportCell" textLabel="Zoe-c6-T7x" detailTextLabel="eff-4m-yLT" style="IBUITableViewCellStyleValue1" id="YDD-ec-sGk">
-                                <rect key="frame" x="0.0" y="276" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="421" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="YDD-ec-sGk" id="U2Z-9t-PYC">
                                     <rect key="frame" x="0.0" y="0.0" width="287" height="43.5"/>
@@ -1536,9 +1555,11 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="colorKeyLabel" destination="GRX-YK-R9Z" id="XMn-RX-P29"/>
                         <outlet property="goalBottomLabel" destination="4NP-D3-ViV" id="phO-iy-hc7"/>
                         <outlet property="goalRadialView" destination="S23-FB-Qsg" id="ZKv-1w-ejD"/>
                         <outlet property="goalTopLabel" destination="6zH-JN-q1c" id="imn-3q-EZX"/>
+                        <outlet property="graphView" destination="mXL-LP-y5f" id="BMv-DB-qWc"/>
                         <outlet property="nameLabel" destination="TgW-Hw-sM8" id="jZF-YC-9jJ"/>
                         <outlet property="todayBottomLabel" destination="H06-l6-avx" id="tfU-yp-e2V"/>
                         <outlet property="todayDividerView" destination="oj4-5U-thS" id="La0-i0-Cnm"/>
@@ -1558,7 +1579,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nh4-0S-4yA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2107.5" y="135.21126760563379"/>
+            <point key="canvasLocation" x="2094.375" y="85.563380281690144"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="a9e-Ya-5tj">
@@ -1582,12 +1603,12 @@
         <scene sceneID="JBx-og-KHg">
             <objects>
                 <tableViewController id="cZk-6N-CCb" customClass="TeamProfileTableViewController" customModule="ReviveFitness" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="qRL-Cf-jXM">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="8" sectionFooterHeight="1" id="qRL-Cf-jXM">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="n68-GE-aQb">
-                            <rect key="frame" x="0.0" y="0.0" width="320" height="204"/>
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="344"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Team Revive" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="D93-Ob-OPw">
@@ -1714,12 +1735,30 @@
                                         </label>
                                     </subviews>
                                 </view>
+                                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aHD-dT-aPa" customClass="DataPointGraphView" customModule="ReviveFitness" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="173" width="320" height="162"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="N1C-HF-pva">
+                                            <rect key="frame" x="12" y="0.0" width="296" height="1"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Color key label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ypI-ah-Bv4">
+                                            <rect key="frame" x="8" y="8" width="304" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" reuseIdentifier="MemberCell" textLabel="zm9-X4-oBh" detailTextLabel="WzQ-Qr-5o0" style="IBUITableViewCellStyleValue1" id="Chg-7c-cDL">
-                                <rect key="frame" x="0.0" y="232" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="400" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Chg-7c-cDL" id="hyk-c5-fHF">
                                     <rect key="frame" x="0.0" y="0.0" width="281" height="43.5"/>
@@ -1758,6 +1797,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="colorKeyLabel" destination="ypI-ah-Bv4" id="M0b-XZ-bRi"/>
+                        <outlet property="graphView" destination="aHD-dT-aPa" id="hWU-xm-CJl"/>
                         <outlet property="nameLabel" destination="D93-Ob-OPw" id="LOa-s7-Yh5"/>
                         <outlet property="rankBottomLabel" destination="ahe-NK-xnG" id="ahK-Gh-YqL"/>
                         <outlet property="rankRadialView" destination="hO4-FO-cjb" id="1DO-4x-TSB"/>
