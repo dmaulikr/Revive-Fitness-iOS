@@ -28,6 +28,11 @@ class PickTeamTableViewController: UITableViewController {
         super.viewWillAppear(animated)
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     // IBAction Functions
     
     @IBAction func cancelButtonTapped() {
@@ -153,7 +158,7 @@ class PickTeamTableViewController: UITableViewController {
         var initialMember = [String : String]()
         initialMember[activeUser!.id] = activeUser!.firstName + " " + activeUser!.lastName
         
-        let newTeam = Team(name: name, points: 0, members: initialMember, numMembers: 1, id: teamId)
+        let newTeam = Team(name: name, members: initialMember, numMembers: 1, id: teamId)
         teamRef.setValue(newTeam.toAnyObject())
         
         let teamMembersRef = databaseRef.child("teamMembers").child(newTeam.id)

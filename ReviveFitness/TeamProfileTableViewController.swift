@@ -9,6 +9,8 @@ class TeamProfileTableViewController: UITableViewController {
     var activeTeam: Team?
     var activeUser: User?
     var teamMembers = [TeamMember]()
+    var teamRankings = [0, 1]
+    var didWaitForViewToAppear = false
     
     @IBOutlet weak var nameLabel: UILabel!
     
@@ -86,7 +88,13 @@ class TeamProfileTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        didWaitForViewToAppear = true
         updateUIElements()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
     
     // UI Functions
@@ -94,12 +102,23 @@ class TeamProfileTableViewController: UITableViewController {
     func updateUIElements() {
         nameLabel.text = "Team \((activeTeam?.teamName)!)"
         updateRadialLabels()
-        updateRadialViews()
+        if didWaitForViewToAppear {
+            updateRadialViews()
+        }
     }
     
     func updateRadialLabels() {
-        rankTopLabel.text = "3"
-        rankBottomLabel.text = "7 teams"
+        var rankSuffix = ""
+        
+        switch teamRankings[0] {
+        case 1: rankSuffix = "st"
+        case 2: rankSuffix = "nd"
+        case 3: rankSuffix = "rd"
+        default: rankSuffix = "th"
+        }
+        
+        rankTopLabel.text = "\(teamRankings[0])\(rankSuffix)"
+        rankBottomLabel.text = "\(teamRankings[1]) teams"
         
         submissionsTopLabel.text = "\(numberOfSubmissions!)"
         submissionsBottomLabel.text = "\(teamMembers.count) reports"
@@ -109,7 +128,11 @@ class TeamProfileTableViewController: UITableViewController {
     }
     
     func updateRadialViews() {
-        let rankProgress: CGFloat = 0.58
+        
+        let teamRank = CGFloat(teamRankings[0] - 1)
+        let numberOfTeams = CGFloat(teamRankings[1])
+        let rankProgress: CGFloat = 1.0 - (teamRank * (1.0 / numberOfTeams))
+        
         let submissionsProgress: CGFloat = CGFloat(numberOfSubmissions) / CGFloat(teamMembers.count)
         let scoreProgress: CGFloat = CGFloat(scoreThisWeek) / CGFloat(potentialScoreThisWeek)
         
@@ -160,6 +183,17 @@ class TeamProfileTableViewController: UITableViewController {
             if let _ = snapshot.value {
                 self.loadTeamScores(with: snapshot)
                 self.addSubmissionObservers()
+                
+                let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
+                let leaderboardUpdate = [self.activeTeamId!: "\(self.scoreThisWeek!)"]
+                teamLeaderboardRef.updateChildValues(leaderboardUpdate)
+            }
+        })
+        let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
+        teamLeaderboardRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                self.teamRankings = self.updateLeaderboards(with: snapshot)
+                self.updateUIElements()
             }
         })
     }
@@ -200,6 +234,23 @@ class TeamProfileTableViewController: UITableViewController {
         }
     }
     
+    func updateLeaderboards(with snapshot: DataSnapshot) -> [Int] {
+        var ranking = 1
+        var rankingSize = 0
+        if let leaderboardsDict = snapshot.value as? [String: String] {
+            for eachValue in leaderboardsDict {
+                if let points = Int(eachValue.value) {
+                    if points > self.scoreThisWeek {
+                        ranking += 1
+                    }
+                    rankingSize += 1
+                }
+            }
+        }
+        if rankingSize == 0 { rankingSize = 1 }
+        return [ranking, rankingSize]
+    }
+    
     func loadTeamMembers(with snapshot: DataSnapshot) -> [TeamMember]? {
         var newMembers = [TeamMember]()
         if let teamMembersDict = snapshot.value as? [String: String] {
@@ -225,16 +276,6 @@ class TeamProfileTableViewController: UITableViewController {
                 }
             }
         }
-    }
-    
-    func shouldUpdateUIElements() -> Bool {
-        var willUpdate = false
-        for eachMember in teamMembers {
-            if eachMember.shouldUpdateRadialViews() {
-                willUpdate = true
-            }
-        }
-        return willUpdate
     }
     
     // Segue Control

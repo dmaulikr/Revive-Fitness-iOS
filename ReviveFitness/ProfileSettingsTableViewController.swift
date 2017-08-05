@@ -158,8 +158,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                                     "startBodyFat": bodyFatTextField.text!,
                                     "oldHabit": oldHabitTextField.text!,
                                     "newHabit": newHabitTextField.text!,
-                                    "fitnessGoal": fitnessGoalTextField.text!,
-                                    "team": activeUser!.teamId!])
+                                    "fitnessGoal": fitnessGoalTextField.text!])
     }
     
     func updateUserInstance() {
@@ -310,15 +309,20 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                 hideDatePicker()
             }
         }
-        
         if indexPath.section == 0 {
+            switch indexPath.row {
+            case 0: emailTextField.becomeFirstResponder()
+            case 1: passwordTextField.becomeFirstResponder()
+            default: break
+            }
+        } else if indexPath.section == 1 {
             switch indexPath.row {
             case 0: firstNameTextField.becomeFirstResponder()
             case 1: lastNameTextField.becomeFirstResponder()
             case 2: phoneTextField.becomeFirstResponder()
             default: break
             }
-        } else if indexPath.section == 1 {
+        } else if indexPath.section == 2 {
             switch indexPath.row {
             case 0: startingWeightTextField.becomeFirstResponder()
             case 1: targetWeightTextField.becomeFirstResponder()

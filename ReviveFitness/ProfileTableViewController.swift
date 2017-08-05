@@ -147,6 +147,11 @@ ProfileSettingsTableViewControllerDelegate {
         updateRadialViews()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     func addFirebaseObservers() {
         if let _ = activeUser {
             let weeklyReportsRef =
