@@ -507,7 +507,7 @@ ProfileSettingsTableViewControllerDelegate {
                     if let _ = weeklyReport {
                         disclosureLabel?.text = "View"
                     } else {
-                        disclosureLabel?.text = "Edit"
+                        disclosureLabel?.text = "View"
                     }
                 } else {
                     disclosureLabel?.text = "Add"

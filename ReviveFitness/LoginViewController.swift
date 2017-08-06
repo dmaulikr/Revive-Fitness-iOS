@@ -17,6 +17,17 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var loginView: UIView!
     @IBOutlet weak var loginViewBottomAnchor: NSLayoutConstraint!
     @IBOutlet weak var tapGestureRecognizer: UITapGestureRecognizer!
+    
+    var weekNumberToday: Int! {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "ww" // Produces int corresponding to week of year
+        
+        let today = Date() // Account for week starting on monday, not sunday
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)
+        
+        let weekNumberToday = Int(dateFormatter.string(from: yesterday!))
+        return weekNumberToday!
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,12 +38,8 @@ class LoginViewController: UIViewController {
         /*
         let newUserRef = self.databaseRef.child("users").childByAutoId()
         let newUserID = newUserRef.key
-        newUserRef.setValue(["name-first": "Dominic", "name-last": "Holmes", "email": "dominicholmes.dev@gmail.com", "password": "admin1", "id": newUserID])
-        let newUserRef2 = self.databaseRef.child("users").childByAutoId()
-        let newUserID2 = newUserRef2.key
-        newUserRef2.setValue(["name-first": "Dominic", "name-last": "Holmes", "email": "dh506605@gmail.com", "password": "user1", "id": newUserID2])
+        newUserRef.setValue(["name-first": "Alonso", "name-last": "Holmes", "email": "alonso@gmail.com", "password": "alonso123", "id": newUserID, "week": ("\(weekNumberToday!)")])
         */
-        
         // Observe any changes in the database
         databaseRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
@@ -65,7 +72,7 @@ class LoginViewController: UIViewController {
     }
     
     func keyboardWillHide(_ notification: Notification){
-        loginViewBottomAnchor.constant = 90.0
+        loginViewBottomAnchor.constant = 0.0
     }
 
     override func didReceiveMemoryWarning() {
@@ -78,6 +85,14 @@ class LoginViewController: UIViewController {
     
     @IBAction func loginButtonPressed() {
         login()
+    }
+    
+    @IBAction func createAccountButtonPressed() {
+        if let url = URL(string: "http://www.revivedellrapids.com") {
+            UIApplication.shared.open(url, options: [:]) {
+                boolean in
+            }
+        }
     }
     
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
