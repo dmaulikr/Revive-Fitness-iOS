@@ -38,7 +38,7 @@ class LoginViewController: UIViewController {
         /*
         let newUserRef = self.databaseRef.child("users").childByAutoId()
         let newUserID = newUserRef.key
-        newUserRef.setValue(["name-first": "Alonso", "name-last": "Holmes", "email": "alonso@gmail.com", "password": "alonso123", "id": newUserID, "week": ("\(weekNumberToday!)")])
+        newUserRef.setValue(["name-first": "Brittani", "name-last": "Bollock", "email": "brit@gmail.com", "password": "password123", "id": newUserID, "week": ("\(weekNumberToday!)")])
         */
         // Observe any changes in the database
         databaseRef.observe(.value, with: { snapshot in

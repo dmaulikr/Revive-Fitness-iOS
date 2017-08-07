@@ -17,6 +17,7 @@ ProfileSettingsTableViewControllerDelegate {
     var weeklyReportSubmitted = false
     
     var reports: [Report?] = [Report]()
+    var historicalReports: [Report?] = [Report]()
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var weeklyReportButton: UIButton!
@@ -42,7 +43,7 @@ ProfileSettingsTableViewControllerDelegate {
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
         return dayNumberToday!
-        //return 7 // ALWAYS SUNDAY (for testing purposes
+        //return 7 // ALWAYS SUNDAY (for testing purposes)
     }
     
     var weekNumberToday: Int! {
@@ -54,6 +55,19 @@ ProfileSettingsTableViewControllerDelegate {
         
         let weekNumberToday = Int(dateFormatter.string(from: yesterday!))
         return weekNumberToday!
+    }
+    
+    var historicalWeeksToConsider: [Int] {
+        var tempWeeks = [Int]()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "ww"
+        let today = Date()
+        for i in 1 ..< 3 {
+            let historicalWeek = Calendar.current.date(byAdding: .day, value: -7 * i, to: today)
+            let weekNumberToday = Int(dateFormatter.string(from: historicalWeek!))
+            tempWeeks.append(weekNumberToday!)
+        }
+        return tempWeeks
     }
     
     var currentYear: Int! {
@@ -144,7 +158,6 @@ ProfileSettingsTableViewControllerDelegate {
         super.viewWillAppear(animated)
         
         updateUIElements()
-        graphView.initializeGraph()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -192,6 +205,19 @@ ProfileSettingsTableViewControllerDelegate {
                 self.updateUIElements()
                 self.updateTeamScore()
             })
+            
+            for eachWeek in historicalWeeksToConsider {
+                self.historicalReports = [Report]()
+                let dailyReportsRef =
+                    databaseRef.child("reports").child("Year-\(currentYear!)").child("Week-\(eachWeek)")
+                let usersDailyReportsForThisWeek = dailyReportsRef.child(activeUser!.id)
+                usersDailyReportsForThisWeek.observe(.value, with: { snapshot in
+                    if let _ = snapshot.value {
+                        self.historicalReports = self.loadDailyReportData(with: snapshot)
+                    }
+                    self.updateUIElements()
+                })
+            }
         }
     }
     
@@ -225,6 +251,7 @@ ProfileSettingsTableViewControllerDelegate {
     func updateUIElements() {
         updateLabels()
         updateWeeklyReportButton()
+        setGraphViewValues()
         self.tableView.reloadData()
     }
     
@@ -273,12 +300,41 @@ ProfileSettingsTableViewControllerDelegate {
         goalRadialView.setValueAnimated(duration: 1.0, newProgressValue: currentWeightGoalProgressPercentage)
     }
     
-    func updateGraphView() {
-        /*var tempDataArray = [50, 50, 50, 50, 50, 50, 50]
+    func setGraphViewValues() {
+        var tempDataArray = [0, 0, 0, 0, 0, 0, 0]
+        var tempHistoricalDataArray = [0, 0, 0, 0, 0, 0, 0]
+        var historicalSums = [0, 0, 0, 0, 0, 0, 0]
+        var historicalDivisors = [0, 0, 0, 0, 0, 0, 0]
+        
         for eachReport in reports {
-            tempDataArray[eachReport!.submissionDay - 1] = eachReport!.score
+            if let score = eachReport!.score {
+                tempDataArray[eachReport!.submissionDay - 1] = score
+            } else {
+                tempDataArray[eachReport!.submissionDay - 1] = 0
+            }
         }
-        graphView.dataToGraph = tempDataArray*/
+        for eachHistReport in historicalReports {
+            if let rep = eachHistReport {
+                let day = rep.submissionDay - 1
+                historicalSums[day] = rep.score!
+                historicalDivisors[day] += 1
+            }
+        }
+        for eachSumIndex in historicalSums.indices {
+            if historicalDivisors[eachSumIndex] == 0 {
+                tempHistoricalDataArray[eachSumIndex] = 0
+            } else {
+                tempHistoricalDataArray[eachSumIndex] =
+                    historicalSums[eachSumIndex] / historicalDivisors[eachSumIndex]
+            }
+        }
+        graphView.dataToGraph = tempDataArray
+        graphView.secondaryDataToGraph = tempHistoricalDataArray
+        graphView.clearGraph()
+        graphView.initializeGraph()
+    }
+    
+    func updateGraphView() {
         graphView.animateDataLines(withDuration: 0.4)
         graphView.animateDataPoints(withDuration: 0.4)
     }

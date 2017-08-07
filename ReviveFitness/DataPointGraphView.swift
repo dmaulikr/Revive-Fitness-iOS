@@ -6,7 +6,9 @@ class DataPointGraphView: UIView {
     
     var primaryDataColor = UIColor(red: 4.0 / 255.0, green: 169 / 255.0, blue: 235.0 / 255.0, alpha: 1.0)
     var primaryLineColor = UIColor(red: 4.0 / 255.0, green: 169 / 255.0, blue: 235.0 / 255.0, alpha: 0.5)
-    var secondaryDataColor = UIColor(white: 0.9, alpha: 1.0)
+    let axisColor = UIColor(white: 0.9, alpha: 1.0)
+    let labelColor = UIColor.darkGray
+    let secondaryDataColor = UIColor.lightGray
     
     var viewHeight: CGFloat!
     var viewWidth: CGFloat!
@@ -18,16 +20,21 @@ class DataPointGraphView: UIView {
     var dataMin: CGFloat!
     var dataRange: CGFloat!
     
-    var dataToGraph: [Int] = [50, 80, 90, 80, 70, 80, 100]
-    var secondaryDataToGraph: [Int] = [0, 5, 20, 40, 30, 70, 50]
+    var dataToGraph: [Int] = [0, 0, 0, 0, 0, 0, 0]
+    var secondaryDataToGraph: [Int] = [0, 0, 0, 0, 0, 0, 0]
     var xAxisLabels: [String] = ["M", "T", "W", "T", "F", "S", "S"]
     
     var finalDataCoordinates: [CGPoint] = [CGPoint]()
     var startingDataCoordinates: [CGPoint] = [CGPoint]()
+    
     var dataCircles: [CAShapeLayer] = [CAShapeLayer]()
     var dataCirclesFinalPaths: [CGPath] = [CGPath]()
+    
     var dataConnectingLines: [CAShapeLayer] = [CAShapeLayer]()
     var dataConnectingLinesFinalPaths: [CGPath] = [CGPath]()
+    
+    var axisLines: [CAShapeLayer] = [CAShapeLayer]()
+    var axisLabels: [UILabel] = [UILabel]()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -166,19 +173,20 @@ class DataPointGraphView: UIView {
     // Create the axis of the graph
     
     func drawGraphAxis() {
-        var axisLines: [CAShapeLayer] = [CAShapeLayer]()
-        axisLines.append(addLine(fromPoint: CGPoint(x: graphFrame.origin.x, y: graphFrame.origin.y),
+        var tempAxisLines: [CAShapeLayer] = [CAShapeLayer]()
+        tempAxisLines.append(addLine(fromPoint: CGPoint(x: graphFrame.origin.x, y: graphFrame.origin.y),
                                  toPoint: CGPoint(x: graphFrame.origin.x + graphWidth, y: graphFrame.origin.y),
-                                 ofColor: secondaryDataColor.cgColor)!)
+                                 ofColor: axisColor.cgColor)!)
         
-        axisLines.append(addLine(fromPoint: CGPoint(x: graphFrame.origin.x, y: graphFrame.origin.y + 0.5 * graphHeight),
+        tempAxisLines.append(addLine(fromPoint: CGPoint(x: graphFrame.origin.x, y: graphFrame.origin.y + 0.5 * graphHeight),
                                  toPoint: CGPoint(x: graphFrame.origin.x + graphWidth, y: graphFrame.origin.y + 0.5 * graphHeight),
-                                 ofColor: secondaryDataColor.cgColor)!)
+                                 ofColor: axisColor.cgColor)!)
         
-        axisLines.append(addLine(fromPoint: CGPoint(x: graphFrame.origin.x, y: graphFrame.origin.y + graphHeight),
+        tempAxisLines.append(addLine(fromPoint: CGPoint(x: graphFrame.origin.x, y: graphFrame.origin.y + graphHeight),
                                  toPoint: CGPoint(x: graphFrame.origin.x + graphWidth, y: graphFrame.origin.y + graphHeight),
-                                 ofColor: secondaryDataColor.cgColor)!)
-        
+                                 ofColor: axisColor.cgColor)!)
+        self.axisLines = tempAxisLines
+        self.axisLabels = [UILabel]()
         generateAxisXLabels()
         generateAxisYLabels()
     }
@@ -218,35 +226,36 @@ class DataPointGraphView: UIView {
             clockwise: true).cgPath
     }
     
-    func createLabel(fromString text: String!, insideRect rect: CGRect, onAxis axis: String) {
+    func createLabel(fromString text: String!, insideRect rect: CGRect, onAxis axis: String) -> UILabel {
         let labelString = NSMutableAttributedString(
             string: text,
             attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 12.0, weight: UIFontWeightUltraLight)])
         let newLabel = UILabel(frame: rect)
         newLabel.attributedText = labelString
-        newLabel.textColor = UIColor.darkGray
+        newLabel.textColor = labelColor
         if axis == "y" { newLabel.textAlignment = .right } else { newLabel.textAlignment = .left }
         self.addSubview(newLabel)
+        return newLabel
     }
     
     // Create labels for the axes
     
     func generateAxisYLabels() {
-        createLabel(fromString: "\(Int(dataMax))",
+        axisLabels.append(createLabel(fromString: "\(Int(dataMax))",
             insideRect: CGRect(x: graphFrame.origin.x - 30,
                                y: graphFrame.origin.y - (21.0 / 2.0),
                                width: 21.0, height: 21.0),
-            onAxis: "y")
-        createLabel(fromString: "\(Int((dataMax - dataMin) / 2.0))",
+            onAxis: "y"))
+        axisLabels.append(createLabel(fromString: "\(Int((dataMax - dataMin) / 2.0))",
             insideRect: CGRect(x: graphFrame.origin.x - 30,
                                y: graphFrame.origin.y + (graphHeight / 2.0) - (21.0 / 2.0),
                                width: 21.0, height: 21.0),
-            onAxis: "y")
-        createLabel(fromString: "\(Int(dataMin))",
+            onAxis: "y"))
+        axisLabels.append(createLabel(fromString: "\(Int(dataMin))",
             insideRect: CGRect(x: graphFrame.origin.x - 30,
                                y: graphFrame.origin.y + graphHeight - (21.0 / 2.0),
                                width: 21.0, height: 21.0),
-            onAxis: "y")
+            onAxis: "y"))
     }
     
     func generateAxisXLabels() {
@@ -254,11 +263,13 @@ class DataPointGraphView: UIView {
         for eachPoint in dataToGraph.indices {
             let xCoordinate = graphFrame.origin.x + (xInterval * CGFloat(eachPoint + 1) - 4.0)
             let yCoordinate = graphFrame.origin.y + (graphHeight * 1.17)
-            createLabel(fromString: xAxisLabels[eachPoint],
+            axisLabels.append(createLabel(fromString: xAxisLabels[eachPoint],
                         insideRect: CGRect(x: xCoordinate, y: yCoordinate, width: 12.0, height: 21.0),
-                        onAxis: "x")
+                        onAxis: "x"))
         }
     }
+    
+    // Animation functions
     
     func animateDataPoints(withDuration duration: TimeInterval) {
         for eachCircleIndex in dataCircles.indices {
@@ -288,5 +299,30 @@ class DataPointGraphView: UIView {
             line.add(animation, forKey: "path")
             line.path = endPath
         }
+    }
+    
+    // Deletion function
+    
+    func clearGraph() {
+        for eachLine in axisLines {
+            eachLine.removeFromSuperlayer()
+        }
+        for eachLabel in axisLabels {
+            eachLabel.removeFromSuperview()
+        }
+        for eachCircle in dataCircles {
+            eachCircle.removeFromSuperlayer()
+        }
+        for eachLine in dataConnectingLines {
+            eachLine.removeFromSuperlayer()
+        }
+        finalDataCoordinates = [CGPoint]()
+        startingDataCoordinates = [CGPoint]()
+        dataCircles = [CAShapeLayer]()
+        dataCirclesFinalPaths = [CGPath]()
+        dataConnectingLines = [CAShapeLayer]()
+        dataConnectingLinesFinalPaths = [CGPath]()
+        axisLines = [CAShapeLayer]()
+        axisLabels = [UILabel]()
     }
 }
