@@ -223,9 +223,12 @@ ProfileSettingsTableViewControllerDelegate {
     
     func updateTeamScore() {
         if let teamId = activeUser?.teamId {
-            let teamScoreRef = databaseRef.child("teamScores").child(teamId)
-            let userTeamScoreUpdate = [activeUser!.id: "\(scoreThisWeek!)"]
-            teamScoreRef.updateChildValues(userTeamScoreUpdate)
+            if let _ = reportForToday {
+                let teamScoreRef = databaseRef.child("teamScores").child(teamId).child(
+                    "Year-\(currentYear!)").child("Week-\(weekNumberToday!)").child("Day-\(dayNumberToday!)")
+                let userTeamScoreUpdate = [activeUser!.id: "\(reportForToday!.score!)"]
+                teamScoreRef.updateChildValues(userTeamScoreUpdate)
+            }
         }
     }
     
@@ -342,12 +345,12 @@ ProfileSettingsTableViewControllerDelegate {
     func colorizeColorKeyLabel() {
         colorKeyLabel.textColor = UIColor.lightGray
         let colorKeyString = NSMutableAttributedString(
-            string: "Points this week versus your historical average",
+            string: "Points this week versus the last three weeks",
             attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14.0, weight: UIFontWeightUltraLight)])
         colorKeyString.addAttribute(
             NSForegroundColorAttributeName, value: goalTopLabel.textColor, range: NSRange(location: 7,length: 10))
         colorKeyString.addAttribute(
-            NSForegroundColorAttributeName, value: UIColor.darkGray, range: NSRange(location: 29,length: 18))
+            NSForegroundColorAttributeName, value: UIColor.darkGray, range: NSRange(location: 28,length: 16))
         colorKeyLabel.attributedText = colorKeyString
     }
     

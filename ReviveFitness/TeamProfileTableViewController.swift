@@ -81,6 +81,25 @@ class TeamProfileTableViewController: UITableViewController {
         return numSubs
     }
     
+    var dailyScores: [Int] {
+        var tempScores = [0, 0, 0, 0, 0, 0, 0]
+        for eachMember in teamMembers {
+            for i in 0..<7 {
+                tempScores[i] += eachMember.getValueScore(forDay: i)
+            }
+        }
+        return tempScores
+    }
+    var historicalDailyScores: [Int] {
+        var tempScores = [0, 0, 0, 0, 0, 0, 0]
+        for eachMember in teamMembers {
+            for i in 0..<7 {
+                tempScores[i] += eachMember.getHistoricalValueScore(forDay: i)
+            }
+        }
+        return tempScores
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -91,9 +110,6 @@ class TeamProfileTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         initializeRadialViews()
-        graphView.primaryDataColor = self.primaryDataColor
-        graphView.primaryLineColor = self.primaryLineColor
-        graphView.initializeGraph()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -111,8 +127,10 @@ class TeamProfileTableViewController: UITableViewController {
     
     func updateUIElements() {
         nameLabel.text = "Team \((activeTeam?.teamName)!)"
+        setGraphViewValues()
         updateRadialLabels()
         if didWaitForViewToAppear {
+            updateRadialLabels()
             updateRadialViews()
             updateGraphView()
         }
@@ -170,6 +188,15 @@ class TeamProfileTableViewController: UITableViewController {
         scoreRadialView.createCircles()
     }
     
+    func setGraphViewValues() {
+        graphView.dataToGraph = dailyScores
+        graphView.secondaryDataToGraph = historicalDailyScores
+        graphView.clearGraph()
+        graphView.primaryDataColor = self.primaryDataColor
+        graphView.primaryLineColor = self.primaryLineColor
+        graphView.initializeGraph()
+    }
+    
     func updateGraphView() {
         graphView.animateDataLines(withDuration: 0.4)
         graphView.animateDataPoints(withDuration: 0.4)
@@ -178,12 +205,12 @@ class TeamProfileTableViewController: UITableViewController {
     func colorizeColorKeyLabel() {
         colorKeyLabel.textColor = UIColor.lightGray
         let colorKeyString = NSMutableAttributedString(
-            string: "Points this week versus your historical average",
+            string: "Team points this week versus last week",
             attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14.0, weight: UIFontWeightUltraLight)])
         colorKeyString.addAttribute(
-            NSForegroundColorAttributeName, value: rankTopLabel.textColor, range: NSRange(location: 7,length: 10))
+            NSForegroundColorAttributeName, value: rankTopLabel.textColor, range: NSRange(location: 12,length: 9))
         colorKeyString.addAttribute(
-            NSForegroundColorAttributeName, value: UIColor.darkGray, range: NSRange(location: 29,length: 18))
+            NSForegroundColorAttributeName, value: UIColor.darkGray, range: NSRange(location: 29,length: 9))
         colorKeyLabel.attributedText = colorKeyString
     }
 
@@ -206,17 +233,29 @@ class TeamProfileTableViewController: UITableViewController {
                 }
             }
         })
-        let teamScoresRef = databaseRef.child("teamScores").child((activeTeamId)!)
-        teamScoresRef.observe(.value, with: { snapshot in
-            if let _ = snapshot.value {
-                self.loadTeamScores(with: snapshot)
-                self.addSubmissionObservers()
+        let teamScoresRef = databaseRef.child("teamScores").child(
+            (activeTeamId)!).child("Year-\(currentYear!)").child("Week-\(self.weekNumberToday!)")
+        for i in 0..<7 {
+            teamScoresRef.child("Day-\(i + 1)").observe(.value, with: { snapshot in
+                if let _ = snapshot.value {
+                    self.loadTeamScores(with: snapshot, forDay: i)
+                    self.addSubmissionObservers()
                 
-                let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
-                let leaderboardUpdate = [self.activeTeamId!: "\(self.scoreThisWeek!)"]
-                teamLeaderboardRef.updateChildValues(leaderboardUpdate)
-            }
-        })
+                    let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
+                    let leaderboardUpdate = [self.activeTeamId!: "\(self.scoreThisWeek!)"]
+                    teamLeaderboardRef.updateChildValues(leaderboardUpdate)
+                }
+            })
+        }
+        let teamHistoricalScoresRef = databaseRef.child("teamScores").child(
+            (activeTeamId)!).child("Year-\(currentYear!)").child("Week-\(self.weekNumberToday! - 1)")
+        for i in 0..<7 {
+            teamHistoricalScoresRef.child("Day-\(i + 1)").observe(.value, with: { snapshot in
+                if let _ = snapshot.value {
+                    self.loadHistoricalTeamScores(with: snapshot, forDay: i)
+                }
+            })
+        }
         let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
         teamLeaderboardRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
@@ -292,13 +331,26 @@ class TeamProfileTableViewController: UITableViewController {
         }
     }
     
-    func loadTeamScores(with snapshot: DataSnapshot) {
+    func loadTeamScores(with snapshot: DataSnapshot, forDay day: Int) {
         if let userScoresDict = snapshot.value as? [String: String] {
             for eachUser in userScoresDict {
                 if let _ = activeTeam {
                     for eachMember in teamMembers {
                         if eachMember.id == eachUser.key {
-                            eachMember.setValueScoreForThisWeek(with: Int(eachUser.value)!)
+                            eachMember.setValueScore(forDay: day, toValue: Int(eachUser.value)!)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    func loadHistoricalTeamScores(with snapshot: DataSnapshot, forDay day: Int) {
+        if let userScoresDict = snapshot.value as? [String: String] {
+            for eachUser in userScoresDict {
+                if let _ = activeTeam {
+                    for eachMember in teamMembers {
+                        if eachMember.id == eachUser.key {
+                            eachMember.setHistoricalValueScore(forDay: day, toValue: Int(eachUser.value)!)
                         }
                     }
                 }
@@ -340,12 +392,12 @@ class TeamProfileTableViewController: UITableViewController {
                     let name = member.name
                     cell.textLabel?.text = name
                     if member.getValueDidSubmitToday() {
-                        cell.detailTextLabel?.text = "Submitted"
-                        cell.detailTextLabel?.textColor = UIColor.lightGray
+                        cell.detailTextLabel?.text = "\(member.getValueScore(forDay: dayNumberToday - 1)) pts"
+                        cell.detailTextLabel?.textColor = rankTopLabel.textColor
                         cell.accessoryType = .checkmark
                     } else {
-                        cell.detailTextLabel?.text = "Remind"
-                        cell.detailTextLabel?.textColor = rankTopLabel.textColor
+                        cell.detailTextLabel?.text = "Not submitted"
+                        cell.detailTextLabel?.textColor = UIColor.lightGray
                         cell.accessoryType = .none
                     }
                 }

@@ -6,7 +6,8 @@ class TeamMember: NSObject {
     let name: String!
     let id: String!
     private var didSubmitToday = false
-    private var scoreForThisWeek = 0
+    private var scoresForThisWeek = [0, 0, 0, 0, 0, 0, 0]
+    private var historicalScoresForThisWeek = [0, 0, 0, 0, 0, 0, 0]
     private var needsUpdate = false
     
     init(name: String, id: String) {
@@ -22,7 +23,7 @@ class TeamMember: NSObject {
             return false
         }
     }
-    
+    // Did submit
     func getValueDidSubmitToday() -> Bool {
         return didSubmitToday
     }
@@ -34,14 +35,35 @@ class TeamMember: NSObject {
         }
     }
     
+    // This week's scores
     func getValueScoreForThisWeek() -> Int {
-        return scoreForThisWeek
+        var temp = 0
+        for eachScore in scoresForThisWeek {
+            temp += eachScore
+        }
+        return temp
     }
     
-    func setValueScoreForThisWeek(with value: Int) {
-        if value != scoreForThisWeek {
+    func getValueScore(forDay day: Int) -> Int {
+        return scoresForThisWeek[day]
+    }
+    
+    func setValueScore(forDay day: Int, toValue value: Int) {
+        if scoresForThisWeek[day] != value {
             needsUpdate = true
-            scoreForThisWeek = value
+            scoresForThisWeek[day] = value
         }
+    }
+    
+    // Last week's scores
+    func setHistoricalValueScore(forDay day: Int, toValue value: Int) {
+        if historicalScoresForThisWeek[day] != value {
+            needsUpdate = true
+            historicalScoresForThisWeek[day] = value
+        }
+    }
+    
+    func getHistoricalValueScore(forDay day: Int) -> Int {
+        return historicalScoresForThisWeek[day]
     }
 }
