@@ -38,7 +38,7 @@ class LoginViewController: UIViewController {
         /*
         let newUserRef = self.databaseRef.child("users").childByAutoId()
         let newUserID = newUserRef.key
-        newUserRef.setValue(["name-first": "Brittani", "name-last": "Bollock", "email": "brit@gmail.com", "password": "password123", "id": newUserID, "week": ("\(weekNumberToday!)")])
+        newUserRef.setValue(["name-first": "Brittani", "name-last": "Bollock", "email": "brit@gmail.com", "password": "password123", "id": newUserID, "isAdmin": "false")])
         */
         // Observe any changes in the database
         databaseRef.observe(.value, with: { snapshot in
@@ -102,8 +102,12 @@ class LoginViewController: UIViewController {
     func login() {
         if attemptLogin() {
             if isProfileComplete() {
-                setUserData(of: authenticatedUser!)
-                performSegue(withIdentifier: "UserProfile", sender: self)
+                if (authenticatedUser?.isAdmin)! {
+                    performSegue(withIdentifier: "AdminPanel", sender: self)
+                } else {
+                    setUserData(of: authenticatedUser!)
+                    performSegue(withIdentifier: "UserProfile", sender: self)
+                }
             } else {
                 performSegue(withIdentifier: "CompleteProfile", sender: self)
             }
@@ -183,6 +187,10 @@ class LoginViewController: UIViewController {
             controller.databaseRef = self.databaseRef
             controller.activeUser = self.authenticatedUser
             controller.firstTimeSettings = true
+        } else if segue.identifier == "AdminPanel" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! AdminPanelChallengeTableViewController
+            controller.databaseRef = self.databaseRef
         }
     }
     

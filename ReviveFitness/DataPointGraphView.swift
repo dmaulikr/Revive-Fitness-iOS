@@ -242,19 +242,19 @@ class DataPointGraphView: UIView {
     
     func generateAxisYLabels() {
         axisLabels.append(createLabel(fromString: "\(Int(dataMax))",
-            insideRect: CGRect(x: graphFrame.origin.x - 30,
+            insideRect: CGRect(x: graphFrame.origin.x - 67,
                                y: graphFrame.origin.y - (21.0 / 2.0),
-                               width: 21.0, height: 21.0),
+                               width: 62.0, height: 21.0),
             onAxis: "y"))
         axisLabels.append(createLabel(fromString: "\(Int((dataMax - dataMin) / 2.0))",
-            insideRect: CGRect(x: graphFrame.origin.x - 30,
+            insideRect: CGRect(x: graphFrame.origin.x - 67,
                                y: graphFrame.origin.y + (graphHeight / 2.0) - (21.0 / 2.0),
-                               width: 21.0, height: 21.0),
+                               width: 62.0, height: 21.0),
             onAxis: "y"))
         axisLabels.append(createLabel(fromString: "\(Int(dataMin))",
-            insideRect: CGRect(x: graphFrame.origin.x - 30,
+            insideRect: CGRect(x: graphFrame.origin.x - 67,
                                y: graphFrame.origin.y + graphHeight - (21.0 / 2.0),
-                               width: 21.0, height: 21.0),
+                               width: 62.0, height: 21.0),
             onAxis: "y"))
     }
     

@@ -8,8 +8,7 @@ class User: NSObject {
     var email: String!
     var password: String!
     let id: String!
-    
-    var weekNumber: Int!
+    let isAdmin: Bool!
     
     var phone: String?
     var birthdate: String?
@@ -27,13 +26,13 @@ class User: NSObject {
     var reports = [Report]()
     var weeklyReport: WeeklyReport?
     
-    init(fname: String, lname: String, email: String, password: String, id: String, weekNumber: Int) {
+    init(fname: String, lname: String, email: String, password: String, id: String, isAdmin: Bool) {
         self.firstName = fname
         self.lastName = lname
         self.email = email
         self.password = password
         self.id = id
-        self.weekNumber = weekNumber
+        self.isAdmin = isAdmin
     }
     
     init(of dict: Dictionary<String, String>) {
@@ -42,7 +41,12 @@ class User: NSObject {
         self.email = dict["email"]
         self.password = dict["password"]
         self.id = dict["id"]
-        self.weekNumber = Int(dict["week"]!)
+        let adminBool = dict["isAdmin"]
+        if adminBool == "true" {
+            self.isAdmin = true
+        } else {
+            self.isAdmin = false
+        }
     }
     
     func loadUserData(from dict: Dictionary<String, String>) {

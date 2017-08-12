@@ -149,8 +149,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                                        "name-last": lastNameTextField.text!,
                                        "email": emailTextField.text!,
                                        "password": passwordTextField.text!,
-                                       "id": activeUser.id,
-                                       "week": "\(activeUser.weekNumber!)"])
+                                       "id": activeUser.id])
         updateUserDataRef.updateChildValues(["phone": phoneTextField.text!,
                                     "birth": birthdateLabel.text!,
                                     "startWeight": startingWeightTextField.text!,
