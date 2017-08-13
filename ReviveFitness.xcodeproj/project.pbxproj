@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B60EA1421F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */; };
+		B60EA1441F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */; };
 		B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */; };
 		B666338F1F0337A100AD5966 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B666338E1F0337A100AD5966 /* AppDelegate.swift */; };
 		B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66633901F0337A100AD5966 /* LoginViewController.swift */; };
@@ -34,6 +35,7 @@
 /* Begin PBXFileReference section */
 		71F1FA24943EB98F72C31F72 /* Pods-ReviveFitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.debug.xcconfig"; sourceTree = "<group>"; };
 		B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelChallengeTableViewController.swift; sourceTree = "<group>"; };
+		B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelTeamTableViewController.swift; sourceTree = "<group>"; };
 		B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialProgressView.swift; sourceTree = "<group>"; };
 		B666338B1F0337A100AD5966 /* ReviveFitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReviveFitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B666338E1F0337A100AD5966 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */,
 				B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */,
 				B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */,
+				B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */,
 				B66633921F0337A100AD5966 /* Main.storyboard */,
 				B66633951F0337A100AD5966 /* Assets.xcassets */,
 				B66633971F0337A100AD5966 /* LaunchScreen.storyboard */,
@@ -262,6 +265,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */,
+				B60EA1441F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift in Sources */,
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
 				B6AD0E951F2BF8C60091350A /* Team.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,

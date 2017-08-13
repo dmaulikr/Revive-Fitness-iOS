@@ -11,13 +11,13 @@ class AdminPanelChallengeTableViewController: UITableViewController {
     
     var databaseRef: DatabaseReference!
     var challenges = [Challenge]()
+    var selectedChallenge: Challenge?
     
     @IBOutlet weak var challengeNameTextField: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        databaseRef = Database.database().reference()
         let challengeRef = databaseRef.child("challengeNames")
         challengeRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
@@ -76,7 +76,17 @@ class AdminPanelChallengeTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        selectedChallenge = challenges[indexPath.row]
+        performSegue(withIdentifier: "AdminPanelTeam", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "AdminPanelTeam" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! AdminPanelTeamTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeChallenge = selectedChallenge!
+        }
     }
     
 }
