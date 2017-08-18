@@ -7,7 +7,7 @@ class PickTeamTableViewController: UITableViewController {
     var databaseRef: DatabaseReference!
     var teams = [Team]()
     var chosenTeam: Team?
-    var activeUser: User?
+    var activeUser: ReviveUser?
     
     final let TEAM_LIMIT = 12
     
@@ -152,7 +152,7 @@ class PickTeamTableViewController: UITableViewController {
     }
     
     func saveTeamToFirebase(with name: String) {
-        let teamRef = databaseRef.child("teams").childByAutoId()
+        let teamRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teams").childByAutoId()
         let teamId = teamRef.key
         
         var initialMember = [String : String]()
@@ -171,12 +171,12 @@ class PickTeamTableViewController: UITableViewController {
     }
     
     func joinTeam(_ team: Team) {
-        let teamRef = databaseRef.child("teams").child(team.id)
+        let teamRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teams").child(team.id)
         team.members[activeUser!.id] = activeUser!.firstName + " " + activeUser!.lastName
         team.numberOfMembers = team.numberOfMembers + 1
         teamRef.setValue(team.toAnyObject())
         
-        let teamMembersRef = databaseRef.child("teamMembers").child(team.id)
+        let teamMembersRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teamMembers").child(team.id)
         let teamMemberUpdate = [activeUser!.id: activeUser!.firstName + " " + activeUser!.lastName]
         teamMembersRef.updateChildValues(teamMemberUpdate)
         

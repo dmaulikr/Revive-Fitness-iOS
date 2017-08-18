@@ -1,16 +1,13 @@
 
 import Foundation
 
-class User: NSObject {
+class ReviveUser: NSObject {
     
     var firstName: String!
     var lastName: String!
-    var email: String!
-    var password: String!
     let id: String!
     let isAdmin: Bool!
     
-    var phone: String?
     var birthdate: String?
     var startWeight: Int?
     var currentWeight: Int?
@@ -26,11 +23,12 @@ class User: NSObject {
     var reports = [Report]()
     var weeklyReport: WeeklyReport?
     
-    init(fname: String, lname: String, email: String, password: String, id: String, isAdmin: Bool) {
+    // Challenge this user is currently operating in
+    var activeChallenge: Challenge?
+    
+    init(fname: String, lname: String, email: String, id: String, isAdmin: Bool) {
         self.firstName = fname
         self.lastName = lname
-        self.email = email
-        self.password = password
         self.id = id
         self.isAdmin = isAdmin
     }
@@ -38,8 +36,6 @@ class User: NSObject {
     init(of dict: Dictionary<String, String>) {
         self.firstName = dict["name-first"]
         self.lastName = dict["name-last"]
-        self.email = dict["email"]
-        self.password = dict["password"]
         self.id = dict["id"]
         let adminBool = dict["isAdmin"]
         if adminBool == "true" {
@@ -51,7 +47,6 @@ class User: NSObject {
     
     func loadUserData(from dict: Dictionary<String, String>) {
         self.birthdate = dict["birth"]!
-        self.phone = dict["phone"]!
         self.startWeight = Int(dict["startWeight"]!)
         self.targetWeight = Int(dict["targetWeight"]!)
         self.startBodyFat = Int(dict["startBodyFat"]!)
@@ -67,5 +62,15 @@ class User: NSObject {
         if dict.keys.contains("team") {
             self.teamId = dict["team"]
         }
+    }
+    
+    func isProfileComplete() -> Bool {
+        return (self.birthdate != nil &&
+            self.startWeight != nil &&
+            self.targetWeight != nil &&
+            self.startBodyFat != nil &&
+            self.oldHabit != nil &&
+            self.newHabit != nil &&
+            self.fitnessGoal != nil)
     }
 }

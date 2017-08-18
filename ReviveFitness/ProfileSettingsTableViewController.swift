@@ -6,7 +6,7 @@ import FirebaseDatabase
 protocol ProfileSettingsTableViewControllerDelegate: class {
     func profileSettingsTableViewControllerDidCancel(_ controller: ProfileSettingsTableViewController)
     func profileSettingsTableViewController(_ controller: ProfileSettingsTableViewController,
-                                   didFinishWith updatedUser: User)
+                                   didFinishWith updatedUser: ReviveUser)
 }
 
 class ProfileSettingsTableViewController: UITableViewController, UITextFieldDelegate {
@@ -15,7 +15,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     
     var databaseRef: DatabaseReference!
     
-    var activeUser: User!
+    var activeUser: ReviveUser!
     weak var delegate: ProfileSettingsTableViewControllerDelegate?
     
     var datePickerVisible = false
@@ -24,9 +24,6 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
-    @IBOutlet weak var emailTextField: UITextField!
-    @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var phoneTextField: UITextField!
     @IBOutlet weak var startingWeightTextField: UITextField!
     @IBOutlet weak var targetWeightTextField: UITextField!
     @IBOutlet weak var bodyFatTextField: UITextField!
@@ -66,9 +63,6 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     func setTextFieldDelegates() {
         firstNameTextField.delegate = self
         lastNameTextField.delegate = self
-        emailTextField.delegate = self
-        passwordTextField.delegate = self
-        phoneTextField.delegate = self
         startingWeightTextField.delegate = self
         targetWeightTextField.delegate = self
         bodyFatTextField.delegate = self
@@ -109,9 +103,9 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         oldHabitTextField.isEnabled = true
         newHabitTextField.isEnabled = true
         fitnessGoalTextField.isEnabled = true
-        phoneTextField.returnKeyType = .next
+        //phoneTextField.returnKeyType = .next
         
-        let enabledColor = emailTextField.textColor!
+        let enabledColor = UIColor.purple
         startingWeightTextField.textColor = enabledColor
         targetWeightTextField.textColor = enabledColor
         bodyFatTextField.textColor = enabledColor
@@ -124,9 +118,6 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     func setInitialValues() {
         firstNameTextField.text = activeUser.firstName
         lastNameTextField.text = activeUser.lastName
-        emailTextField.text = activeUser.email
-        passwordTextField.text = activeUser.password
-        phoneTextField.text = activeUser.phone
         birthdateLabel.text = activeUser.birthdate
         if let _ = activeUser.startWeight {
             startingWeightTextField.text = "\(activeUser.startWeight!)"
@@ -147,10 +138,10 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         let updateUserDataRef = self.databaseRef.child("userData").child(activeUser.id)
         updateUserProfileRef.setValue(["name-first": firstNameTextField.text!,
                                        "name-last": lastNameTextField.text!,
-                                       "email": emailTextField.text!,
-                                       "password": passwordTextField.text!,
-                                       "id": activeUser.id])
-        updateUserDataRef.updateChildValues(["phone": phoneTextField.text!,
+                                       "id": activeUser.id,
+                                       "isAdmin": "\(activeUser!.isAdmin!)"
+                                       ])
+        updateUserDataRef.updateChildValues([
                                     "birth": birthdateLabel.text!,
                                     "startWeight": startingWeightTextField.text!,
                                     "targetWeight": targetWeightTextField.text!,
@@ -163,10 +154,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     func updateUserInstance() {
         activeUser.firstName = firstNameTextField.text
         activeUser.lastName = lastNameTextField.text
-        activeUser.email = emailTextField.text
-        activeUser.password = passwordTextField.text
         activeUser.birthdate = birthdateLabel.text
-        activeUser.phone = phoneTextField.text
         activeUser.startWeight = Int(startingWeightTextField.text!)
         activeUser.targetWeight = Int(targetWeightTextField.text!)
         activeUser.startBodyFat = Int(bodyFatTextField.text!)
@@ -189,16 +177,10 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     }
     
     @IBAction func returnKeyPressed(sender: UITextField) {
-        if sender == emailTextField {
-            passwordTextField.becomeFirstResponder()
-        } else if sender == passwordTextField {
-            firstNameTextField.becomeFirstResponder()
-        } else if sender == firstNameTextField {
+        if sender == firstNameTextField {
             lastNameTextField.becomeFirstResponder()
         } else if sender == lastNameTextField {
-            phoneTextField.becomeFirstResponder()
-        } else if sender == phoneTextField {
-            phoneTextField.resignFirstResponder()
+            lastNameTextField.resignFirstResponder()
             showDatePicker()
         } else if sender == startingWeightTextField {
             targetWeightTextField.becomeFirstResponder()
@@ -310,15 +292,12 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
         }
         if indexPath.section == 0 {
             switch indexPath.row {
-            case 0: emailTextField.becomeFirstResponder()
-            case 1: passwordTextField.becomeFirstResponder()
             default: break
             }
         } else if indexPath.section == 1 {
             switch indexPath.row {
             case 0: firstNameTextField.becomeFirstResponder()
             case 1: lastNameTextField.becomeFirstResponder()
-            case 2: phoneTextField.becomeFirstResponder()
             default: break
             }
         } else if indexPath.section == 2 {
@@ -350,6 +329,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
                    replacementString string: String) -> Bool {
         
         // Formats phone text field with ( ) -
+        /*
         if (textField == self.phoneTextField){
             let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
             let components = newString.components(separatedBy: NSCharacterSet.decimalDigits.inverted)
@@ -385,7 +365,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
             textField.text = formattedString as String
             return false
         // Formats text to accept only integers
-        } else if (textField == self.bodyFatTextField) || (textField == self.startingWeightTextField) ||
+        } else*/ if (textField == self.bodyFatTextField) || (textField == self.startingWeightTextField) ||
                     (textField == self.targetWeightTextField){
             let allowedCharacters = CharacterSet.decimalDigits
             let characterSet = CharacterSet(charactersIn: string)
@@ -402,12 +382,12 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
             }
             return allowedCharacters.isSuperset(of: characterSet)
         // Restricts length of password field to 12 characters
-        } else if textField == self.passwordTextField {
+        }/* else if textField == self.passwordTextField {
             let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
             return !(newString.characters.contains(" ") || newString.characters.count > 12)
         // Restricts length of other text fields to 50 characters
-        } else if (textField == self.firstNameTextField) || (textField == self.lastNameTextField) ||
-                  (textField == self.emailTextField) || (textField == self.oldHabitTextField) ||
+        }*/ else if (textField == self.firstNameTextField) || (textField == self.lastNameTextField) ||
+                  /*(textField == self.emailTextField) ||*/ (textField == self.oldHabitTextField) ||
                   (textField == self.newHabitTextField) || (textField == self.fitnessGoalTextField){
             let newString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
             return newString.characters.count <= 50
@@ -419,7 +399,7 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
     func findErrors() -> [String] {
         var errors = [String]()
         
-        if emailTextField.hasText {
+        /*if emailTextField.hasText {
             let emailRegEx = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}"
             do {
                 let regex = try NSRegularExpression(pattern: emailRegEx)
@@ -444,16 +424,16 @@ class ProfileSettingsTableViewController: UITableViewController, UITextFieldDele
             }
         } else {
             errors.append("\n- Enter a valid password")
-        }
+        }*/
         if !firstNameTextField.hasText {
             errors.append("\n- Enter a first name")
         }
         if !lastNameTextField.hasText {
             errors.append("\n- Enter a last name")
         }
-        if !phoneTextField.hasText {
+        /*if !phoneTextField.hasText {
             errors.append("\n- Enter a phone number")
-        }
+        }*/
         if let text = birthdateLabel.text {
             if text.characters.count == 0 {
                 errors.append("\n- Select a birthdate")

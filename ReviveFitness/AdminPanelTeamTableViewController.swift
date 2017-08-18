@@ -26,7 +26,7 @@ class AdminPanelTeamTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let teamRef = databaseRef.child(activeChallenge!.id).child("teams")
+        let teamRef = databaseRef.child("challenges").child(activeChallenge!.id).child("teams")
         teamRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.teams = self.loadTeams(with: snapshot)
@@ -34,7 +34,7 @@ class AdminPanelTeamTableViewController: UITableViewController {
             }
         })
         
-        let teamLeaderboardsRef = databaseRef.child(activeChallenge!.id).child("teamLeaderboards")
+        let teamLeaderboardsRef = databaseRef.child("challenges").child(activeChallenge!.id).child("teamLeaderboards")
         teamLeaderboardsRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.loadTeamScores(with: snapshot)
@@ -50,6 +50,10 @@ class AdminPanelTeamTableViewController: UITableViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    @IBAction func addUserButtonTapped() {
+        performSegue(withIdentifier: "AdminPanelAddUser", sender: self)
     }
     
     @IBAction func challengesBarButtonTapped() {
@@ -120,6 +124,15 @@ class AdminPanelTeamTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "AdminPanelAddUser" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! AdminPanelAddUserTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeChallenge = self.activeChallenge
+        }
     }
     
 }

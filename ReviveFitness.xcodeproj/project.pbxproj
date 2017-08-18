@@ -16,10 +16,12 @@
 		B66633961F0337A100AD5966 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B66633951F0337A100AD5966 /* Assets.xcassets */; };
 		B66633991F0337A100AD5966 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B66633971F0337A100AD5966 /* LaunchScreen.storyboard */; };
 		B66633A11F034C5500AD5966 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B66633A01F034C5500AD5966 /* GoogleService-Info.plist */; };
-		B66633A31F0356D400AD5966 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66633A21F0356D300AD5966 /* User.swift */; };
+		B66633A31F0356D400AD5966 /* ReviveUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66633A21F0356D300AD5966 /* ReviveUser.swift */; };
 		B67CC3851F041EF100B69C93 /* ProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */; };
 		B67CC3871F056D9C00B69C93 /* ReportTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */; };
 		B67CC3891F0697E700B69C93 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3881F0697E700B69C93 /* Report.swift */; };
+		B699EC491F4686420096FAD7 /* SignUpTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */; };
+		B699EC4B1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699EC4A1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift */; };
 		B69B0D481F3046EA00537BEA /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D471F3046EA00537BEA /* Functions.swift */; };
 		B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */; };
 		B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */; };
@@ -35,27 +37,29 @@
 /* Begin PBXFileReference section */
 		71F1FA24943EB98F72C31F72 /* Pods-ReviveFitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.debug.xcconfig"; sourceTree = "<group>"; };
 		B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelChallengeTableViewController.swift; sourceTree = "<group>"; };
-		B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelTeamTableViewController.swift; sourceTree = "<group>"; };
+		B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AdminPanelTeamTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialProgressView.swift; sourceTree = "<group>"; };
 		B666338B1F0337A100AD5966 /* ReviveFitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReviveFitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B666338E1F0337A100AD5966 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B66633901F0337A100AD5966 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		B666338E1F0337A100AD5966 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		B66633901F0337A100AD5966 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LoginViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B66633931F0337A100AD5966 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B66633951F0337A100AD5966 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B66633981F0337A100AD5966 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B666339A1F0337A100AD5966 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B66633A01F034C5500AD5966 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		B66633A21F0356D300AD5966 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileTableViewController.swift; sourceTree = "<group>"; };
+		B66633A21F0356D300AD5966 /* ReviveUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviveUser.swift; sourceTree = "<group>"; };
+		B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ProfileTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B67CC3861F056D9C00B69C93 /* ReportTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportTableViewController.swift; sourceTree = "<group>"; };
 		B67CC3881F0697E700B69C93 /* Report.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpTableViewController.swift; sourceTree = "<group>"; };
+		B699EC4A1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelAddUserTableViewController.swift; sourceTree = "<group>"; };
 		B69B0D471F3046EA00537BEA /* Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataPointGraphView.swift; sourceTree = "<group>"; };
-		B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
+		B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B6A561761F196A2000F1A0C7 /* WeeklyReportTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeeklyReportTableViewController.swift; sourceTree = "<group>"; };
 		B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeeklyReport.swift; sourceTree = "<group>"; };
-		B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickTeamTableViewController.swift; sourceTree = "<group>"; };
-		B6AD0E921F2BF5460091350A /* TeamProfileTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamProfileTableViewController.swift; sourceTree = "<group>"; };
+		B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PickTeamTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		B6AD0E921F2BF5460091350A /* TeamProfileTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TeamProfileTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B6AD0E941F2BF8C60091350A /* Team.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
 		B6AD0E961F2E1DB50091350A /* TeamMember.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamMember.swift; sourceTree = "<group>"; };
 		EA470CA725A65E58DA65E5D5 /* Pods-ReviveFitness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReviveFitness.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReviveFitness/Pods-ReviveFitness.release.xcconfig"; sourceTree = "<group>"; };
@@ -97,12 +101,13 @@
 			children = (
 				B666338E1F0337A100AD5966 /* AppDelegate.swift */,
 				B69B0D471F3046EA00537BEA /* Functions.swift */,
-				B66633A21F0356D300AD5966 /* User.swift */,
+				B66633A21F0356D300AD5966 /* ReviveUser.swift */,
 				B67CC3881F0697E700B69C93 /* Report.swift */,
 				B6A561781F196D3200F1A0C7 /* WeeklyReport.swift */,
 				B6AD0E941F2BF8C60091350A /* Team.swift */,
 				B6AD0E961F2E1DB50091350A /* TeamMember.swift */,
 				B66633901F0337A100AD5966 /* LoginViewController.swift */,
+				B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */,
 				B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */,
 				B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */,
 				B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */,
@@ -113,6 +118,7 @@
 				B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */,
 				B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */,
 				B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */,
+				B699EC4A1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift */,
 				B66633921F0337A100AD5966 /* Main.storyboard */,
 				B66633951F0337A100AD5966 /* Assets.xcassets */,
 				B66633971F0337A100AD5966 /* LaunchScreen.storyboard */,
@@ -267,6 +273,7 @@
 				B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */,
 				B60EA1441F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift in Sources */,
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
+				B699EC4B1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift in Sources */,
 				B6AD0E951F2BF8C60091350A /* Team.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,
 				B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */,
@@ -279,7 +286,8 @@
 				B666338F1F0337A100AD5966 /* AppDelegate.swift in Sources */,
 				B6A561771F196A2100F1A0C7 /* WeeklyReportTableViewController.swift in Sources */,
 				B67CC3871F056D9C00B69C93 /* ReportTableViewController.swift in Sources */,
-				B66633A31F0356D400AD5966 /* User.swift in Sources */,
+				B66633A31F0356D400AD5966 /* ReviveUser.swift in Sources */,
+				B699EC491F4686420096FAD7 /* SignUpTableViewController.swift in Sources */,
 				B67CC3891F0697E700B69C93 /* Report.swift in Sources */,
 				B60EA1421F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift in Sources */,
 			);

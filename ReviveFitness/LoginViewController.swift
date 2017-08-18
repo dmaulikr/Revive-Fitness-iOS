@@ -5,9 +5,11 @@ import Firebase
 class LoginViewController: UIViewController {
     
     var databaseRef: DatabaseReference!
-    var users = [User]()
-    var userData: [String : NSDictionary]?
-    var authenticatedUser: User?
+    
+    var authenticatedUser: ReviveUser?
+    var authenticatedFIRUser: User?
+    
+    var potentialChallenges: [Challenge] = [Challenge]()
     
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -33,20 +35,11 @@ class LoginViewController: UIViewController {
         super.viewDidLoad()
         
         databaseRef = Database.database().reference()
-        
-        // Fake user profiles
-        /*
-        let newUserRef = self.databaseRef.child("users").childByAutoId()
-        let newUserID = newUserRef.key
-        newUserRef.setValue(["name-first": "Brittani", "name-last": "Bollock", "email": "brit@gmail.com", "password": "password123", "id": newUserID, "isAdmin": "false")])
-        */
-        // Observe any changes in the database
-        databaseRef.observe(.value, with: { snapshot in
-            if let _ = snapshot.value {
-                self.users = self.loadUsers(with: snapshot)
-            }
-        })
         self.view.addGestureRecognizer(tapGestureRecognizer)
+        
+        //let newChallengeRef = databaseRef.child("challengeNames").childByAutoId()
+        //newChallengeRef.setValue("Revive Challenge")
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -84,96 +77,120 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginButtonPressed() {
-        login()
+        attemptLogin()
     }
     
     @IBAction func createAccountButtonPressed() {
-        if let url = URL(string: "http://www.revivedellrapids.com") {
-            UIApplication.shared.open(url, options: [:]) {
-                boolean in
-            }
-        }
+        performSegue(withIdentifier: "SignUp", sender: self)
     }
     
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
         self.view.endEditing(true)
     }
     
-    func login() {
-        if attemptLogin() {
-            if isProfileComplete() {
-                if (authenticatedUser?.isAdmin)! {
-                    performSegue(withIdentifier: "AdminPanel", sender: self)
+    @IBAction func textFieldValueValueChanged() {
+        if emailTextField.hasText && passwordTextField.hasText {
+            loginButton.isEnabled = true
+        } else {
+            loginButton.isEnabled = false
+        }
+    }
+    
+    
+    func attemptLogin() {
+        if emailTextField.hasText && passwordTextField.hasText {
+            Auth.auth().signIn(withEmail: emailTextField.text!, password: passwordTextField.text!) { (user, error) in
+                if error != nil {
+                    self.errorMessageLabel.text = error.debugDescription
+                    print(error.debugDescription)
+                }
+                _ = Auth.auth().addStateDidChangeListener { (auth, user) in
+                    self.authenticatedFIRUser = user
+                    if user != nil {
+                        // TEMP WAY TO CREATE USER
+                        //let userCreateRef = self.databaseRef.child("users").child(user!.uid)
+                        //userCreateRef.setValue(["name-first": "Dominic", "name-last": "Holmes", "id": user!.uid, "isAdmin": "true"])
+                        self.attemptLoadUser(with: user!.uid)
+                        self.attemptLoadChallenges(with: user!.uid)
+                    }
+                }
+            }
+        }
+    }
+    
+    func proceedWithLogin() {
+        if let user = authenticatedUser {
+            if user.isAdmin {
+                performSegue(withIdentifier: "AdminPanel", sender: self)
+            } else if potentialChallenges.count > 0 {
+                if potentialChallenges.count == 1 {
+                    user.activeChallenge = potentialChallenges[0]
+                    if user.isProfileComplete() {
+                        performSegue(withIdentifier: "UserProfile", sender: self)
+                    } else {
+                        performSegue(withIdentifier: "CompleteProfile", sender: self)
+                    }
+                }
+                performSegue(withIdentifier: "ChooseChallenge", sender: self)
+            } else {
+                errorMessageLabel.text = "Please wait for your account to be added to a challenge."
+            }
+        } else {
+            print("TRIED LOGIN")
+            errorMessageLabel.text = "Please wait for your account to be verified by Revive (< 1 day)."
+        }
+    }
+    
+    // Load user and challenges (after login verfified)
+    
+    func attemptLoadUser(with id: String) {
+        let userRef = databaseRef.child("users").child(id)
+        userRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                if let userDict = snapshot.value as? Dictionary<String, String> {
+                    self.authenticatedUser = ReviveUser.init(of: userDict)
+                    self.setUserData(of: self.authenticatedUser!)
+                    self.proceedWithLogin()
                 } else {
-                    setUserData(of: authenticatedUser!)
-                    performSegue(withIdentifier: "UserProfile", sender: self)
+                    self.authenticatedUser = nil
                 }
             } else {
-                performSegue(withIdentifier: "CompleteProfile", sender: self)
+                self.authenticatedUser = nil
             }
-        }
+        })
     }
     
-    func attemptLogin() -> Bool {
-        errorMessageLabel.text = ""
-        for user in users {
-            if user.email == emailTextField.text! {
-                if user.password == passwordTextField.text! {
-                    authenticatedUser = user
-                    errorMessageLabel.text = ""
-                    return true
-                } else {
-                    errorMessageLabel.text = "Incorrect password, please try again."
-                    return false
-                }
-            }
-        }
-        errorMessageLabel.text = "Email not recognized, sorry!"
-        authenticatedUser = nil
-        return false
-    }
-    
-    func isProfileComplete() -> Bool {
-        let id = authenticatedUser?.id
-        if let keys = userData?.keys {
-            for eachKey in keys {
-                if eachKey == id {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    
-    func loadUsers(with snapshot: DataSnapshot) -> [User] {
-        
-        var loadedUsers = [User]()
-        
-        if let snapshotDict = snapshot.value as? [String : NSDictionary] {
-            if let usersDict = snapshotDict["users"] as? [String : NSDictionary] {
-                for eachUserId in usersDict {
-                    let userDict = usersDict[eachUserId.key]!
-                    loadedUsers.append(User.init(of: userDict as! Dictionary<String, String>))
-                }
-            }
-            
-            if let usersDataDict = snapshotDict["userData"] as? [String : NSDictionary] {
-                userData = usersDataDict
-            }
-        }
-        return loadedUsers
-    }
-    
-    func setUserData(of user: User) {
-        let userDataRef = databaseRef.child("userData").child(authenticatedUser!.id)
+    func setUserData(of user: ReviveUser) {
+        let userDataRef = databaseRef.child("userData").child(user.id)
         userDataRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 if let userDataDict = snapshot.value as? [String : String] {
-                    self.authenticatedUser!.loadUserData(from: userDataDict)
+                    user.loadUserData(from: userDataDict)
                 }
             }
         })
     }
+    
+    func attemptLoadChallenges(with id: String) {
+        let usersChallengesRef = databaseRef.child("usersChallenges").child(id)
+        usersChallengesRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                self.potentialChallenges = self.loadUsersChallenges(withSnapshot: snapshot)
+            }
+        })
+    }
+    
+    func loadUsersChallenges(withSnapshot snapshot: DataSnapshot) -> [Challenge] {
+        var loadedChallenges = [Challenge]()
+        if let challengesDict = snapshot.value as? [String: String] {
+            for eachChallenge in challengesDict {
+                loadedChallenges.append(Challenge(name: eachChallenge.value, id: eachChallenge.key))
+            }
+        }
+        return loadedChallenges
+    }
+    
+    // Segue control
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "UserProfile" {
@@ -191,14 +208,10 @@ class LoginViewController: UIViewController {
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! AdminPanelChallengeTableViewController
             controller.databaseRef = self.databaseRef
-        }
-    }
-    
-    @IBAction func textFieldValueValueChanged() {
-        if emailTextField.hasText && passwordTextField.hasText {
-            loginButton.isEnabled = true
-        } else {
-            loginButton.isEnabled = false
+        } else if segue.identifier == "SignUp" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! SignUpTableViewController
+            controller.databaseRef = self.databaseRef
         }
     }
 

@@ -10,7 +10,7 @@ class TeamProfileTableViewController: UITableViewController {
     var databaseRef: DatabaseReference!
     var activeTeamId: String?
     var activeTeam: Team?
-    var activeUser: User?
+    var activeUser: ReviveUser?
     var teamMembers = [TeamMember]()
     var teamRankings = [0, 1]
     var didWaitForViewToAppear = false
@@ -217,14 +217,14 @@ class TeamProfileTableViewController: UITableViewController {
     // Firebase functions
     
     func addFirebaseObservers() {
-        let teamsRef = databaseRef.child("teams").child((activeTeamId)!)
+        let teamsRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teams").child((activeTeamId)!)
         teamsRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.activeTeam = self.loadTeam(with: snapshot)
                 self.updateUIElements()
             }
         })
-        let teamMembersRef = databaseRef.child("teamMembers").child((activeTeamId)!)
+        let teamMembersRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teamMembers").child((activeTeamId)!)
         teamMembersRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 if let _ = self.activeTeam {
@@ -233,7 +233,7 @@ class TeamProfileTableViewController: UITableViewController {
                 }
             }
         })
-        let teamScoresRef = databaseRef.child("teamScores").child(
+        let teamScoresRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teamScores").child(
             (activeTeamId)!).child("Year-\(currentYear!)").child("Week-\(self.weekNumberToday!)")
         for i in 0..<7 {
             teamScoresRef.child("Day-\(i + 1)").observe(.value, with: { snapshot in
@@ -247,7 +247,7 @@ class TeamProfileTableViewController: UITableViewController {
                 }
             })
         }
-        let teamHistoricalScoresRef = databaseRef.child("teamScores").child(
+        let teamHistoricalScoresRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teamScores").child(
             (activeTeamId)!).child("Year-\(currentYear!)").child("Week-\(self.weekNumberToday! - 1)")
         for i in 0..<7 {
             teamHistoricalScoresRef.child("Day-\(i + 1)").observe(.value, with: { snapshot in
@@ -256,7 +256,7 @@ class TeamProfileTableViewController: UITableViewController {
                 }
             })
         }
-        let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
+        let teamLeaderboardRef = self.databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teamLeaderboards")
         teamLeaderboardRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.teamRankings = self.updateLeaderboards(with: snapshot)
@@ -268,7 +268,7 @@ class TeamProfileTableViewController: UITableViewController {
     func addSubmissionObservers() {
         for eachMember in teamMembers{
             let memberSubmissionRef =
-                databaseRef.child("reports").child(
+                databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("reports").child(
                     "Year-\(currentYear!)").child(
                         "Week-\(weekNumberToday!)").child(
                             eachMember.id).child(

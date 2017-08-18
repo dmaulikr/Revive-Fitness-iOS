@@ -7,7 +7,8 @@ ReportTableViewControllerDelegate, WeeklyReportTableViewControllerDelegate,
 ProfileSettingsTableViewControllerDelegate {
     
     var databaseRef: DatabaseReference!
-    var activeUser: User?
+    var activeUser: ReviveUser?
+    
     var reportForToday: Report?
     var reportToView: Report?
     
@@ -175,7 +176,7 @@ ProfileSettingsTableViewControllerDelegate {
     func addFirebaseObservers() {
         if let _ = activeUser {
             let weeklyReportsRef =
-                databaseRef.child("weeklyReports").child("Year-\(currentYear!)").child("Week-\(weekNumberToday!)")
+                databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("weeklyReports").child("Year-\(currentYear!)").child("Week-\(weekNumberToday!)")
             let thisWeekUserReportRef = weeklyReportsRef.child(activeUser!.id)
             thisWeekUserReportRef.observe(.value, with: { snapshot in
                 if let _ = snapshot.value {
@@ -193,7 +194,7 @@ ProfileSettingsTableViewControllerDelegate {
             })
             
             let dailyReportsRef =
-                databaseRef.child("reports").child("Year-\(currentYear!)").child("Week-\(weekNumberToday!)")
+                databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("reports").child("Year-\(currentYear!)").child("Week-\(weekNumberToday!)")
             let usersDailyReportsForThisWeek = dailyReportsRef.child(activeUser!.id)
             usersDailyReportsForThisWeek.observe(.value, with: { snapshot in
                 if let _ = snapshot.value {
@@ -209,7 +210,7 @@ ProfileSettingsTableViewControllerDelegate {
             for eachWeek in historicalWeeksToConsider {
                 self.historicalReports = [Report]()
                 let dailyReportsRef =
-                    databaseRef.child("reports").child("Year-\(currentYear!)").child("Week-\(eachWeek)")
+                    databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("reports").child("Year-\(currentYear!)").child("Week-\(eachWeek)")
                 let usersDailyReportsForThisWeek = dailyReportsRef.child(activeUser!.id)
                 usersDailyReportsForThisWeek.observe(.value, with: { snapshot in
                     if let _ = snapshot.value {
@@ -224,7 +225,7 @@ ProfileSettingsTableViewControllerDelegate {
     func updateTeamScore() {
         if let teamId = activeUser?.teamId {
             if let _ = reportForToday {
-                let teamScoreRef = databaseRef.child("teamScores").child(teamId).child(
+                let teamScoreRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teamScores").child(teamId).child(
                     "Year-\(currentYear!)").child("Week-\(weekNumberToday!)").child("Day-\(dayNumberToday!)")
                 let userTeamScoreUpdate = [activeUser!.id: "\(reportForToday!.score!)"]
                 teamScoreRef.updateChildValues(userTeamScoreUpdate)
@@ -627,7 +628,7 @@ ProfileSettingsTableViewControllerDelegate {
     // ProfileSettingsTableVC Delegate Methods
     
     func profileSettingsTableViewController(_ controller: ProfileSettingsTableViewController,
-                                            didFinishWith updatedUser: User) {
+                                            didFinishWith updatedUser: ReviveUser) {
         activeUser = updatedUser
         updateUIElements()
         dismiss(animated: true, completion: nil)
@@ -676,7 +677,7 @@ ProfileSettingsTableViewControllerDelegate {
     
     func saveReport(_ report: Report) {
         let newReportRef =
-            self.databaseRef.child("reports").child(
+            self.databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("reports").child(
                 "Year-\(currentYear!)").child(
                     "Week-\(weekNumberToday!)").child(
                         activeUser!.id).child(
@@ -686,7 +687,7 @@ ProfileSettingsTableViewControllerDelegate {
     }
     
     func saveWeeklyReport(_ weeklyReport: WeeklyReport) {
-        let weeklyReportRef = self.databaseRef.child(
+        let weeklyReportRef = self.databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child(
             "weeklyReports").child(
                 "Year-\(currentYear!)").child(
                     "Week-\(weekNumberToday!)").child(

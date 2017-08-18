@@ -8,4 +8,5 @@ target 'ReviveFitness' do
   # Pods for ReviveFitness
   pod 'Firebase/Core'
   pod 'Firebase/Database'
+  pod 'Firebase/Auth'
 end
