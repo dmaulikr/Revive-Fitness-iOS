@@ -56,10 +56,6 @@ class AdminPanelTeamTableViewController: UITableViewController {
         performSegue(withIdentifier: "AdminPanelAddUser", sender: self)
     }
     
-    @IBAction func challengesBarButtonTapped() {
-        dismiss(animated: true, completion: nil)
-    }
-    
     func loadTeams(with snapshot: DataSnapshot) -> [TeamOverview] {
         var loadedTeams = [TeamOverview]()
         
@@ -121,9 +117,13 @@ class AdminPanelTeamTableViewController: UITableViewController {
         }
         return cell!
     }
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90.0
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -132,6 +132,10 @@ class AdminPanelTeamTableViewController: UITableViewController {
             let controller = navigationController.topViewController as! AdminPanelAddUserTableViewController
             controller.databaseRef = self.databaseRef
             controller.activeChallenge = self.activeChallenge
+        } else if segue.identifier == "AdminPanel" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! AdminPanelChallengeTableViewController
+            controller.databaseRef = self.databaseRef
         }
     }
     

@@ -241,7 +241,8 @@ class TeamProfileTableViewController: UITableViewController {
                     self.loadTeamScores(with: snapshot, forDay: i)
                     self.addSubmissionObservers()
                 
-                    let teamLeaderboardRef = self.databaseRef.child("teamLeaderboards")
+                    let teamLeaderboardRef = self.databaseRef.child("challenges").child(
+                        self.activeUser!.activeChallenge!.id).child("teamLeaderboards")
                     let leaderboardUpdate = [self.activeTeamId!: "\(self.scoreThisWeek!)"]
                     teamLeaderboardRef.updateChildValues(leaderboardUpdate)
                 }

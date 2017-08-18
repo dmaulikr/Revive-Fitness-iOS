@@ -22,6 +22,8 @@
 		B67CC3891F0697E700B69C93 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3881F0697E700B69C93 /* Report.swift */; };
 		B699EC491F4686420096FAD7 /* SignUpTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */; };
 		B699EC4B1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699EC4A1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift */; };
+		B699EC4D1F4783850096FAD7 /* ChooseChallengeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699EC4C1F4783850096FAD7 /* ChooseChallengeTableViewController.swift */; };
+		B699EC4F1F479B2B0096FAD7 /* ForgotPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699EC4E1F479B2B0096FAD7 /* ForgotPasswordViewController.swift */; };
 		B69B0D481F3046EA00537BEA /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D471F3046EA00537BEA /* Functions.swift */; };
 		B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */; };
 		B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */; };
@@ -53,6 +55,8 @@
 		B67CC3881F0697E700B69C93 /* Report.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpTableViewController.swift; sourceTree = "<group>"; };
 		B699EC4A1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelAddUserTableViewController.swift; sourceTree = "<group>"; };
+		B699EC4C1F4783850096FAD7 /* ChooseChallengeTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseChallengeTableViewController.swift; sourceTree = "<group>"; };
+		B699EC4E1F479B2B0096FAD7 /* ForgotPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewController.swift; sourceTree = "<group>"; };
 		B69B0D471F3046EA00537BEA /* Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		B69B0D4D1F3644F200537BEA /* DataPointGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataPointGraphView.swift; sourceTree = "<group>"; };
 		B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -107,7 +111,9 @@
 				B6AD0E941F2BF8C60091350A /* Team.swift */,
 				B6AD0E961F2E1DB50091350A /* TeamMember.swift */,
 				B66633901F0337A100AD5966 /* LoginViewController.swift */,
+				B699EC4E1F479B2B0096FAD7 /* ForgotPasswordViewController.swift */,
 				B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */,
+				B699EC4C1F4783850096FAD7 /* ChooseChallengeTableViewController.swift */,
 				B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */,
 				B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */,
 				B67CC3841F041EF100B69C93 /* ProfileTableViewController.swift */,
@@ -272,8 +278,10 @@
 			files = (
 				B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */,
 				B60EA1441F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift in Sources */,
+				B699EC4F1F479B2B0096FAD7 /* ForgotPasswordViewController.swift in Sources */,
 				B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */,
 				B699EC4B1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift in Sources */,
+				B699EC4D1F4783850096FAD7 /* ChooseChallengeTableViewController.swift in Sources */,
 				B6AD0E951F2BF8C60091350A /* Team.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,
 				B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */,

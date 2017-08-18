@@ -8,6 +8,7 @@ class ReviveUser: NSObject {
     let id: String!
     let isAdmin: Bool!
     
+    var phone: String?
     var birthdate: String?
     var startWeight: Int?
     var currentWeight: Int?
@@ -46,6 +47,7 @@ class ReviveUser: NSObject {
     }
     
     func loadUserData(from dict: Dictionary<String, String>) {
+        self.phone = dict["phone"]!
         self.birthdate = dict["birth"]!
         self.startWeight = Int(dict["startWeight"]!)
         self.targetWeight = Int(dict["targetWeight"]!)
@@ -65,7 +67,9 @@ class ReviveUser: NSObject {
     }
     
     func isProfileComplete() -> Bool {
-        return (self.birthdate != nil &&
+        return (
+            self.phone != nil &&
+            self.birthdate != nil &&
             self.startWeight != nil &&
             self.targetWeight != nil &&
             self.startBodyFat != nil &&

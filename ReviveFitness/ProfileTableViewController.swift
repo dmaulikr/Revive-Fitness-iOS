@@ -695,7 +695,9 @@ ProfileSettingsTableViewControllerDelegate {
         
         weeklyReportRef.setValue(weeklyReport.toAnyObject())
         
-        let userDataUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
+        let userDataUpdateRef = self.databaseRef.child("challenges").child(
+            activeUser!.activeChallenge!.id).child("userData").child(activeUser!.id)
+        
         var userDataUpdate = ["currentWeight": "\(weeklyReport.newWeight!)",
         "currentBodyFat": "\(weeklyReport.newBodyFat!)"] as [String: String]
         

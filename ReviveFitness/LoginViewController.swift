@@ -15,6 +15,7 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var errorMessageLabel: UILabel!
     @IBOutlet weak var loginButton: UIButton!
+    @IBOutlet weak var spinner: UIActivityIndicatorView!
     
     @IBOutlet weak var loginView: UIView!
     @IBOutlet weak var loginViewBottomAnchor: NSLayoutConstraint!
@@ -36,9 +37,6 @@ class LoginViewController: UIViewController {
         
         databaseRef = Database.database().reference()
         self.view.addGestureRecognizer(tapGestureRecognizer)
-        
-        //let newChallengeRef = databaseRef.child("challengeNames").childByAutoId()
-        //newChallengeRef.setValue("Revive Challenge")
         
     }
     
@@ -96,22 +94,28 @@ class LoginViewController: UIViewController {
         }
     }
     
+    func startLoading() {
+        spinner.startAnimating()
+        loginButton.setTitle("", for: .normal)
+    }
+    
+    func stopLoading() {
+        spinner.stopAnimating()
+        loginButton.setTitle("Login", for: .normal)
+    }
     
     func attemptLogin() {
         if emailTextField.hasText && passwordTextField.hasText {
+            startLoading()
             Auth.auth().signIn(withEmail: emailTextField.text!, password: passwordTextField.text!) { (user, error) in
                 if error != nil {
                     self.errorMessageLabel.text = error.debugDescription
-                    print(error.debugDescription)
+                    self.stopLoading()
                 }
                 _ = Auth.auth().addStateDidChangeListener { (auth, user) in
                     self.authenticatedFIRUser = user
                     if user != nil {
-                        // TEMP WAY TO CREATE USER
-                        //let userCreateRef = self.databaseRef.child("users").child(user!.uid)
-                        //userCreateRef.setValue(["name-first": "Dominic", "name-last": "Holmes", "id": user!.uid, "isAdmin": "true"])
                         self.attemptLoadUser(with: user!.uid)
-                        self.attemptLoadChallenges(with: user!.uid)
                     }
                 }
             }
@@ -130,13 +134,15 @@ class LoginViewController: UIViewController {
                     } else {
                         performSegue(withIdentifier: "CompleteProfile", sender: self)
                     }
+                } else {
+                    performSegue(withIdentifier: "ChooseChallenge", sender: self)
                 }
-                performSegue(withIdentifier: "ChooseChallenge", sender: self)
             } else {
+                stopLoading()
                 errorMessageLabel.text = "Please wait for your account to be added to a challenge."
             }
         } else {
-            print("TRIED LOGIN")
+            stopLoading()
             errorMessageLabel.text = "Please wait for your account to be verified by Revive (< 1 day)."
         }
     }
@@ -149,8 +155,7 @@ class LoginViewController: UIViewController {
             if let _ = snapshot.value {
                 if let userDict = snapshot.value as? Dictionary<String, String> {
                     self.authenticatedUser = ReviveUser.init(of: userDict)
-                    self.setUserData(of: self.authenticatedUser!)
-                    self.proceedWithLogin()
+                    self.attemptLoadChallenges(with: self.authenticatedUser!.id)
                 } else {
                     self.authenticatedUser = nil
                 }
@@ -160,14 +165,16 @@ class LoginViewController: UIViewController {
         })
     }
     
-    func setUserData(of user: ReviveUser) {
-        let userDataRef = databaseRef.child("userData").child(user.id)
+    func setUserData(of user: ReviveUser, forChallenge challenge: Challenge) {
+        let userDataRef = self.databaseRef.child("challenges").child(
+            challenge.id).child("userData").child(user.id)
         userDataRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 if let userDataDict = snapshot.value as? [String : String] {
                     user.loadUserData(from: userDataDict)
                 }
             }
+            self.proceedWithLogin()
         })
     }
     
@@ -176,6 +183,11 @@ class LoginViewController: UIViewController {
         usersChallengesRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.potentialChallenges = self.loadUsersChallenges(withSnapshot: snapshot)
+                if self.potentialChallenges.count == 1 {
+                    self.setUserData(of: self.authenticatedUser!, forChallenge: self.potentialChallenges[0])
+                } else {
+                    self.proceedWithLogin()
+                }
             }
         })
     }
@@ -193,6 +205,7 @@ class LoginViewController: UIViewController {
     // Segue control
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        stopLoading()
         if segue.identifier == "UserProfile" {
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! ProfileTableViewController
@@ -212,6 +225,12 @@ class LoginViewController: UIViewController {
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! SignUpTableViewController
             controller.databaseRef = self.databaseRef
+        } else if segue.identifier == "ChooseChallenge" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! ChooseChallengeTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.authenticatedUser!
+            controller.challengeChoices = self.potentialChallenges
         }
     }
 

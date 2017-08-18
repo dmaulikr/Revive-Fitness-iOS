@@ -14,8 +14,7 @@ class PickTeamTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Observe any changes in the database
-        let teamsRef = databaseRef.child("teams")
+        let teamsRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teams")
         teamsRef.observe(.value, with: { snapshot in
             if let _ = snapshot.value {
                 self.teams = self.loadTeams(with: snapshot)
@@ -152,7 +151,8 @@ class PickTeamTableViewController: UITableViewController {
     }
     
     func saveTeamToFirebase(with name: String) {
-        let teamRef = databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("teams").childByAutoId()
+        let teamRef = databaseRef.child("challenges").child(
+            activeUser!.activeChallenge!.id).child("teams").childByAutoId()
         let teamId = teamRef.key
         
         var initialMember = [String : String]()
@@ -161,11 +161,13 @@ class PickTeamTableViewController: UITableViewController {
         let newTeam = Team(name: name, members: initialMember, numMembers: 1, id: teamId)
         teamRef.setValue(newTeam.toAnyObject())
         
-        let teamMembersRef = databaseRef.child("teamMembers").child(newTeam.id)
+        let teamMembersRef = databaseRef.child("challenges").child(
+            activeUser!.activeChallenge!.id).child("teamMembers").child(newTeam.id)
         teamMembersRef.setValue(newTeam.toAnyObjectMembers())
         
         activeUser?.teamId = newTeam.id
-        let userUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
+        let userUpdateRef = self.databaseRef.child("challenges").child(
+            activeUser!.activeChallenge!.id).child("userData").child(activeUser!.id)
         let teamUpdate = ["team": activeUser!.teamId!]
         userUpdateRef.updateChildValues(teamUpdate)
     }
@@ -181,7 +183,8 @@ class PickTeamTableViewController: UITableViewController {
         teamMembersRef.updateChildValues(teamMemberUpdate)
         
         activeUser?.teamId = team.id
-        let userUpdateRef = self.databaseRef.child("userData").child(activeUser!.id)
+        let userUpdateRef = self.databaseRef.child("challenges").child(
+            activeUser!.activeChallenge!.id).child("userData").child(activeUser!.id)
         let teamUpdate = ["team": activeUser!.teamId!]
         userUpdateRef.updateChildValues(teamUpdate)
     }

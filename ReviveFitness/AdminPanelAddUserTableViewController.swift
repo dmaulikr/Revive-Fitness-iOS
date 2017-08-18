@@ -49,6 +49,32 @@ class AdminPanelAddUserTableViewController: UITableViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    @IBAction func addRemoveButtonTapped(sender:AnyObject) {
+        let buttonPosition = sender.convert(CGPoint.zero, to: self.tableView)
+        let indexPath = self.tableView.indexPathForRow(at: buttonPosition)
+        if indexPath != nil {
+            if indexPath!.section == 0 {
+                removeUser(at: indexPath!.row)
+            } else if indexPath!.section == 1 {
+                addUser(at: indexPath!.row)
+            }
+        }
+    }
+    
+    func addUser(at row: Int) {
+        let user = usersNotInChallenge[row]
+        
+        let usersChallengesRef = databaseRef.child("usersChallenges").child(user.id)
+        usersChallengesRef.updateChildValues([activeChallenge.id: activeChallenge.name])
+    }
+    
+    func removeUser(at row: Int) {
+        let user = usersInChallenge[row]
+        
+        let usersChallengesRef = databaseRef.child("usersChallenges").child(user.id).child(activeChallenge.id)
+        usersChallengesRef.setValue(nil)
+    }
+    
     func loadAllUsers(with snapshot: DataSnapshot) {
         var loadedUsers = [NameIdPair]()
         
@@ -137,6 +163,15 @@ class AdminPanelAddUserTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "AdminPanelTeam" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! AdminPanelTeamTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeChallenge = self.activeChallenge
+        }
     }
     
 }

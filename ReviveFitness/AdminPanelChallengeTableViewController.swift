@@ -40,6 +40,7 @@ class AdminPanelChallengeTableViewController: UITableViewController {
         if let name = challengeNameTextField.text {
             let newChallengeRef = databaseRef.child("challengeNames").childByAutoId()
             newChallengeRef.setValue(name)
+            displayAlert("Challenge Created", "New challenge created with name: \(name)", [""])
         }
     }
     
@@ -86,7 +87,27 @@ class AdminPanelChallengeTableViewController: UITableViewController {
             let controller = navigationController.topViewController as! AdminPanelTeamTableViewController
             controller.databaseRef = self.databaseRef
             controller.activeChallenge = selectedChallenge!
+        } else if segue.identifier == "AdminPanelLogOut" {
+            
+            let firebaseAuth = Auth.auth()
+            do {
+                try firebaseAuth.signOut()
+            } catch {
+            }
         }
+    }
+    
+    func displayAlert(_ title: String, _ messageHeader: String, _ errors: [String]) {
+        var message = messageHeader
+        for eachError in errors {
+            message += eachError
+        }
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true)
     }
     
 }
