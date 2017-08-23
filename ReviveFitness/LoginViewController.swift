@@ -1,6 +1,7 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 
 class LoginViewController: UIViewController {
     
@@ -17,8 +18,8 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var loginView: UIView!
-    @IBOutlet weak var loginViewBottomAnchor: NSLayoutConstraint!
     @IBOutlet weak var tapGestureRecognizer: UITapGestureRecognizer!
     
     var weekNumberToday: Int! {
@@ -46,7 +47,7 @@ class LoginViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)),
                                                name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)),
-                                               name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+                                                name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -55,15 +56,18 @@ class LoginViewController: UIViewController {
     }
     
     func keyboardWillShow(_ notification: Notification) {
-        if let userInfo = notification.userInfo {
-            if let keyboardSize =  (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-                loginViewBottomAnchor.constant = keyboardSize.height
-            }
-        }
+        var userInfo = notification.userInfo!
+        var keyboardFrame: CGRect = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
+        keyboardFrame = self.view.convert(keyboardFrame, from: nil)
+        
+        var contentInset: UIEdgeInsets = self.scrollView.contentInset
+        contentInset.bottom = keyboardFrame.size.height + (loginView.frame.height * 0.5)
+        scrollView.contentInset = contentInset
     }
     
     func keyboardWillHide(_ notification: Notification){
-        loginViewBottomAnchor.constant = 0.0
+        let contentInset: UIEdgeInsets = UIEdgeInsets.zero
+        scrollView.contentInset = contentInset
     }
 
     override func didReceiveMemoryWarning() {

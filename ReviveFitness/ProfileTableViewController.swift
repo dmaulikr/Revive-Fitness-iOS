@@ -44,7 +44,6 @@ ProfileSettingsTableViewControllerDelegate {
         dateFormatter.dateFormat = "ee" // Produces int corresponding to day (1 = monday, 2 = tuesday...)
         let dayNumberToday = Int(dateFormatter.string(from: Date()))?.convertDay()
         return dayNumberToday!
-        //return 7 // ALWAYS SUNDAY (for testing purposes)
     }
     
     var weekNumberToday: Int! {
@@ -99,10 +98,35 @@ ProfileSettingsTableViewControllerDelegate {
     }
     
     var currentWeightGoalProgressPercentage: CGFloat! {
-        if let _ = activeUser?.currentWeight {
+        if let currentWeight = activeUser?.currentWeight {
             let changeInWeight = CGFloat((activeUser?.targetWeight)! - (activeUser?.startWeight)!)
             let progressSoFar = CGFloat((activeUser?.targetWeight)! - (activeUser?.currentWeight)!)
-            return progressSoFar / changeInWeight
+            
+            if (activeUser?.targetWeight)! < (activeUser?.startWeight)! {
+                if currentWeight >= (activeUser?.startWeight)! {
+                    return 0.0
+                } else if currentWeight <= (activeUser?.targetWeight)! {
+                    return 1.0
+                } else {
+                    return 1.0 - (progressSoFar / changeInWeight)
+                }
+            } else if (activeUser?.targetWeight)! > (activeUser?.startWeight)! {
+                if currentWeight <= (activeUser?.startWeight)! {
+                    return 0.0
+                } else if currentWeight >= (activeUser?.targetWeight)! {
+                    return 1.0
+                } else {
+                    return 1.0 - (progressSoFar / changeInWeight)
+                }
+            } else {
+                if currentWeight > (activeUser?.targetWeight)! {
+                    return CGFloat((activeUser?.targetWeight)!) / CGFloat(currentWeight)
+                } else if currentWeight < (activeUser?.targetWeight)! {
+                    return CGFloat(currentWeight) / CGFloat((activeUser?.targetWeight)!)
+                } else {
+                    return 1.0
+                }
+            }
         } else if (activeUser?.targetWeight)! == (activeUser?.startWeight)! {
             return 1.0
         } else {
@@ -112,19 +136,50 @@ ProfileSettingsTableViewControllerDelegate {
     
     var weightGoalProgress: Int! {
         if let _ = activeUser?.currentWeight {
-            return abs((activeUser?.targetWeight)! - (activeUser?.currentWeight)!)
+            let weightDiffTarget = abs((activeUser?.targetWeight)! - (activeUser?.currentWeight)!)
+            let weightDiffStart = abs((activeUser?.startWeight)! - (activeUser?.currentWeight)!)
+            
+            if (activeUser?.targetWeight)! > (activeUser?.startWeight)! {
+                return weightDiffStart
+            } else if (activeUser?.targetWeight)! < (activeUser?.startWeight)! {
+                return weightDiffStart
+            } else {
+                return weightDiffTarget
+            }
         } else {
             return 0
         }
     }
     
-    var weightGoalType: String! {
-        if (activeUser?.targetWeight)! > (activeUser?.startWeight)! {
-            return "lbs gained"
-        } else if (activeUser?.targetWeight)! < (activeUser?.startWeight)! {
-            return "lbs lost"
+    var weightGoalCurrentVerbage: String! {
+        if let weight = activeUser?.currentWeight {
+            if (activeUser?.targetWeight)! > (activeUser?.startWeight)! {
+                if weight > (activeUser?.startWeight)! {
+                    return "lb gain"
+                } else if weight < (activeUser?.startWeight)! {
+                    return "lbs lost"
+                } else {
+                    return "lb change"
+                }
+            } else if (activeUser?.targetWeight)! < (activeUser?.startWeight)! {
+                if weight > (activeUser?.startWeight)! {
+                    return "lb gain"
+                } else if weight < (activeUser?.startWeight)! {
+                    return "lbs lost"
+                } else {
+                    return "lb change"
+                }
+            } else {
+                if weight > (activeUser?.startWeight)! {
+                    return "lbs high"
+                } else if weight < (activeUser?.startWeight)! {
+                    return "lbs low"
+                } else {
+                    return "lb change"
+                }
+            }
         } else {
-            return "lbs off"
+            return "lb change"
         }
     }
     
@@ -153,6 +208,10 @@ ProfileSettingsTableViewControllerDelegate {
         todayRadialView.createCircles()
         
         colorizeColorKeyLabel()
+        
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(TeamProfileTableViewController.orientationChanged),
+            name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -209,12 +268,19 @@ ProfileSettingsTableViewControllerDelegate {
             
             for eachWeek in historicalWeeksToConsider {
                 self.historicalReports = [Report]()
-                let dailyReportsRef =
-                    databaseRef.child("challenges").child(activeUser!.activeChallenge!.id).child("reports").child("Year-\(currentYear!)").child("Week-\(eachWeek)")
+                let dailyReportsRef = databaseRef.child(
+                    "challenges").child(
+                        activeUser!.activeChallenge!.id).child(
+                            "reports").child(
+                                "Year-\(currentYear!)").child(
+                                    "Week-\(eachWeek)")
                 let usersDailyReportsForThisWeek = dailyReportsRef.child(activeUser!.id)
                 usersDailyReportsForThisWeek.observe(.value, with: { snapshot in
                     if let _ = snapshot.value {
-                        self.historicalReports = self.loadDailyReportData(with: snapshot)
+                        let tempHistReports = self.loadDailyReportData(with: snapshot)
+                        for eachReport in tempHistReports {
+                            self.historicalReports.append(eachReport)
+                        }
                     }
                     self.updateUIElements()
                 })
@@ -252,6 +318,15 @@ ProfileSettingsTableViewControllerDelegate {
     
     // UI Functions
     
+    func orientationChanged() {
+        if graphView.frame.width != graphView.viewWidth {
+            graphView.clearGraph()
+            graphView.initializeGraph()
+            updateGraphView()
+        }
+        print("didn't need update")
+    }
+    
     func updateUIElements() {
         updateLabels()
         updateWeeklyReportButton()
@@ -264,7 +339,7 @@ ProfileSettingsTableViewControllerDelegate {
         updateRadialLabels()
     }
     
-    func updateRadialLabels() {  
+    func updateRadialLabels() {
         if let rep = reportForToday {
             todayTopLabel.text = ("\((rep.score)!)")
             todayBottomLabel.text = "100 pts"
@@ -281,7 +356,7 @@ ProfileSettingsTableViewControllerDelegate {
         weekBottomLabel.text = "\(potentialScoreThisWeek!) pts"
         
         goalTopLabel.text = "\(Int(currentWeightGoalProgressPercentage * 100.0))%"
-        goalBottomLabel.text = "\(weightGoalProgress!) \(weightGoalType!)"
+        goalBottomLabel.text = "\(weightGoalProgress!) \(weightGoalCurrentVerbage!)"
     }
     
     func updateWeeklyReportButton() {

@@ -4,8 +4,8 @@ import UIKit
 
 class DataPointGraphView: UIView {
     
-    var primaryDataColor = UIColor(red: 4.0 / 255.0, green: 169 / 255.0, blue: 235.0 / 255.0, alpha: 1.0)
-    var primaryLineColor = UIColor(red: 4.0 / 255.0, green: 169 / 255.0, blue: 235.0 / 255.0, alpha: 0.5)
+    var primaryDataColor = UIColor(red: 0.0 / 255.0, green: 195.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
+    var primaryLineColor = UIColor(red: 0.0 / 255.0, green: 195.0 / 255.0, blue: 255.0 / 255.0, alpha: 0.5)
     let axisColor = UIColor(white: 0.9, alpha: 1.0)
     let labelColor = UIColor.darkGray
     let secondaryDataColor = UIColor.lightGray

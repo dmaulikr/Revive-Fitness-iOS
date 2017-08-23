@@ -1,6 +1,7 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 
 class SignUpTableViewController: UITableViewController {
     

@@ -105,6 +105,10 @@ class TeamProfileTableViewController: UITableViewController {
         
         addFirebaseObservers()
         colorizeColorKeyLabel()
+        
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(TeamProfileTableViewController.orientationChanged),
+            name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -124,6 +128,15 @@ class TeamProfileTableViewController: UITableViewController {
     }
     
     // UI Functions
+    
+    func orientationChanged() {
+        if graphView.frame.width != graphView.viewWidth {
+            graphView.clearGraph()
+            graphView.initializeGraph()
+            updateGraphView()
+        }
+        print("didn't need update")
+    }
     
     func updateUIElements() {
         nameLabel.text = "Team \((activeTeam?.teamName)!)"

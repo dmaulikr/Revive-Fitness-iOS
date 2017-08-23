@@ -1,6 +1,7 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 
 struct Challenge {
     let name: String
