@@ -26,6 +26,14 @@ class SignUpTableViewController: UITableViewController {
         super.viewWillAppear(animated)
     }
     
+    @IBAction func privacyPolicyButtonPressed() {
+        if let url = URL(string: "https://www.iubenda.com/privacy-policy/8203081") {
+            UIApplication.shared.open(url, options: [:]) {
+                boolean in
+            }
+        }
+    }
+    
     @IBAction func firstNameFieldNextButtonPressed() {
         lastNameTextField.becomeFirstResponder()
     }
@@ -71,6 +79,9 @@ class SignUpTableViewController: UITableViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
     
     func createAccount() {
         let errors = findErrors()

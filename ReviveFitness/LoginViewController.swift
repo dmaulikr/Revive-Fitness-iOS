@@ -14,7 +14,6 @@ class LoginViewController: UIViewController {
     
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var errorMessageLabel: UILabel!
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     
@@ -38,6 +37,12 @@ class LoginViewController: UIViewController {
         
         databaseRef = Database.database().reference()
         self.view.addGestureRecognizer(tapGestureRecognizer)
+        
+        let firebaseAuth = Auth.auth()
+        do {
+            try firebaseAuth.signOut()
+        } catch _ as NSError {
+        }
         
     }
     
@@ -72,6 +77,14 @@ class LoginViewController: UIViewController {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    @IBAction func privacyPolicyButtonPressed() {
+        if let url = URL(string: "https://www.iubenda.com/privacy-policy/8203081") {
+            UIApplication.shared.open(url, options: [:]) {
+                boolean in
+            }
+        }
     }
     
     @IBAction func emailFieldNextButtonPressed() {
@@ -113,7 +126,6 @@ class LoginViewController: UIViewController {
             startLoading()
             Auth.auth().signIn(withEmail: emailTextField.text!, password: passwordTextField.text!) { (user, error) in
                 if error != nil {
-                    self.errorMessageLabel.text = error.debugDescription
                     self.stopLoading()
                 }
                 _ = Auth.auth().addStateDidChangeListener { (auth, user) in
@@ -143,11 +155,11 @@ class LoginViewController: UIViewController {
                 }
             } else {
                 stopLoading()
-                errorMessageLabel.text = "Please wait for your account to be added to a challenge."
+                //errorMessageLabel.text = "Please wait for your account to be added to a challenge."
             }
         } else {
             stopLoading()
-            errorMessageLabel.text = "Please wait for your account to be verified by Revive (< 1 day)."
+            //errorMessageLabel.text = "Please wait for your account to be verified by Revive (< 1 day)."
         }
     }
     
