@@ -121,12 +121,39 @@ class LoginViewController: UIViewController {
         loginButton.setTitle("Login", for: .normal)
     }
     
+    func displayAlert(with errors: [String]) {
+        var message = ""
+        for eachError in errors {
+            message += eachError
+        }
+        let alert = UIAlertController(title: "Unable to Login",
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true)
+    }
+    
     func attemptLogin() {
         if emailTextField.hasText && passwordTextField.hasText {
             startLoading()
-            Auth.auth().signIn(withEmail: emailTextField.text!, password: passwordTextField.text!) { (user, error) in
-                if error != nil {
+            Auth.auth().signIn(withEmail: emailTextField.text!,
+                               password: passwordTextField.text!) { (user, error) in
+                if let error = error {
                     self.stopLoading()
+                    let nsError = error as NSError
+                    switch AuthErrorCode(rawValue: nsError.code)! {
+                    case .operationNotAllowed:
+                        self.displayAlert(with: ["Account not enabled, please contact support"])
+                    case .invalidEmail:
+                        self.displayAlert(with: ["Please enter a valid email address"])
+                    case .userDisabled:
+                        self.displayAlert(with: ["Your account is disabled, please contact support"])
+                    case .wrongPassword:
+                        self.displayAlert(with: ["Incorrect password, please try again"])
+                    default:
+                        self.displayAlert(with: ["Unknown error, please try again"])
+                    }
                 }
                 _ = Auth.auth().addStateDidChangeListener { (auth, user) in
                     self.authenticatedFIRUser = user
@@ -135,6 +162,8 @@ class LoginViewController: UIViewController {
                     }
                 }
             }
+        } else {
+            displayAlert(with: ["Please enter your email and password"])
         }
     }
     
@@ -155,11 +184,11 @@ class LoginViewController: UIViewController {
                 }
             } else {
                 stopLoading()
-                //errorMessageLabel.text = "Please wait for your account to be added to a challenge."
+                displayAlert(with: ["You do not belong to any challenges"])
             }
         } else {
             stopLoading()
-            //errorMessageLabel.text = "Please wait for your account to be verified by Revive (< 1 day)."
+            displayAlert(with: ["Error logging in"])
         }
     }
     
