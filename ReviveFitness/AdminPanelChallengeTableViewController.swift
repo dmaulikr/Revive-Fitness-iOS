@@ -8,6 +8,13 @@ struct Challenge {
     let id: String
 }
 
+extension Challenge: Equatable {}
+
+func ==(lhs: Challenge, rhs: Challenge) -> Bool {
+    let areEqual = lhs.id == rhs.id
+    return areEqual
+}
+
 class AdminPanelChallengeTableViewController: UITableViewController {
     
     var databaseRef: DatabaseReference!

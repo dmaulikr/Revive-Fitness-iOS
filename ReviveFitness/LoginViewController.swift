@@ -11,6 +11,7 @@ class LoginViewController: UIViewController {
     var authenticatedFIRUser: User?
     
     var potentialChallenges: [Challenge] = [Challenge]()
+    var allChallenges: [Challenge] = [Challenge]()
     
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -171,7 +172,11 @@ class LoginViewController: UIViewController {
         if let user = authenticatedUser {
             if user.isAdmin {
                 performSegue(withIdentifier: "AdminPanel", sender: self)
-            } else if potentialChallenges.count > 0 {
+            } else {
+                performSegue(withIdentifier: "ChooseChallenge", sender: self)
+            }
+
+            /*else if potentialChallenges.count > 0 {
                 if potentialChallenges.count == 1 {
                     user.activeChallenge = potentialChallenges[0]
                     if user.isProfileComplete() {
@@ -185,7 +190,8 @@ class LoginViewController: UIViewController {
             } else {
                 stopLoading()
                 displayAlert(with: ["You do not belong to any challenges"])
-            }
+            } */
+
         } else {
             stopLoading()
             displayAlert(with: ["Error logging in"])
@@ -201,6 +207,7 @@ class LoginViewController: UIViewController {
                 if let userDict = snapshot.value as? Dictionary<String, String> {
                     self.authenticatedUser = ReviveUser.init(of: userDict)
                     self.attemptLoadChallenges(with: self.authenticatedUser!.id)
+                    self.attemptLoadAllChallenges()
                 } else {
                     self.authenticatedUser = nil
                 }
@@ -247,6 +254,25 @@ class LoginViewController: UIViewController {
         return loadedChallenges
     }
     
+    func attemptLoadAllChallenges() {
+        let challengesRef = databaseRef.child("challengeNames")
+        challengesRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                self.allChallenges = self.loadAllChallenges(withSnapshot: snapshot)
+            }
+        })
+    }
+    
+    func loadAllChallenges(withSnapshot snapshot: DataSnapshot) -> [Challenge] {
+        var loadedChallenges = [Challenge]()
+        if let challengesDict = snapshot.value as? [String: String] {
+            for eachChallenge in challengesDict {
+                loadedChallenges.append(Challenge(name: eachChallenge.value, id: eachChallenge.key))
+            }
+        }
+        return loadedChallenges
+    }
+    
     // Segue control
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -276,6 +302,7 @@ class LoginViewController: UIViewController {
             controller.databaseRef = self.databaseRef
             controller.activeUser = self.authenticatedUser!
             controller.challengeChoices = self.potentialChallenges
+            controller.allChallenges = self.allChallenges
         }
     }
 

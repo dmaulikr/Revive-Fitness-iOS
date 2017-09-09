@@ -10,6 +10,8 @@
 		B60EA1421F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */; };
 		B60EA1441F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */; };
 		B64A7ED91F2058EC00D2CF2D /* RadialProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */; };
+		B65330E21F643C1E001118A8 /* SignUpChooseChallengeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65330E11F643C1E001118A8 /* SignUpChooseChallengeTableViewController.swift */; };
+		B65330E41F644042001118A8 /* ChallengePaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65330E31F644042001118A8 /* ChallengePaymentViewController.swift */; };
 		B666338F1F0337A100AD5966 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B666338E1F0337A100AD5966 /* AppDelegate.swift */; };
 		B66633911F0337A100AD5966 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66633901F0337A100AD5966 /* LoginViewController.swift */; };
 		B66633941F0337A100AD5966 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B66633921F0337A100AD5966 /* Main.storyboard */; };
@@ -41,6 +43,8 @@
 		B60EA1411F3FBBFA004EAF93 /* AdminPanelChallengeTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdminPanelChallengeTableViewController.swift; sourceTree = "<group>"; };
 		B60EA1431F3FCADD004EAF93 /* AdminPanelTeamTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AdminPanelTeamTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B64A7ED81F2058EC00D2CF2D /* RadialProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialProgressView.swift; sourceTree = "<group>"; };
+		B65330E11F643C1E001118A8 /* SignUpChooseChallengeTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpChooseChallengeTableViewController.swift; sourceTree = "<group>"; };
+		B65330E31F644042001118A8 /* ChallengePaymentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChallengePaymentViewController.swift; sourceTree = "<group>"; };
 		B666338B1F0337A100AD5966 /* ReviveFitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReviveFitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B666338E1F0337A100AD5966 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		B66633901F0337A100AD5966 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LoginViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -113,6 +117,8 @@
 				B66633901F0337A100AD5966 /* LoginViewController.swift */,
 				B699EC4E1F479B2B0096FAD7 /* ForgotPasswordViewController.swift */,
 				B699EC481F4686420096FAD7 /* SignUpTableViewController.swift */,
+				B65330E11F643C1E001118A8 /* SignUpChooseChallengeTableViewController.swift */,
+				B65330E31F644042001118A8 /* ChallengePaymentViewController.swift */,
 				B699EC4C1F4783850096FAD7 /* ChooseChallengeTableViewController.swift */,
 				B6A561741F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift */,
 				B6AD0E901F2BF5320091350A /* PickTeamTableViewController.swift */,
@@ -283,8 +289,10 @@
 				B699EC4B1F4698B20096FAD7 /* AdminPanelAddUserTableViewController.swift in Sources */,
 				B699EC4D1F4783850096FAD7 /* ChooseChallengeTableViewController.swift in Sources */,
 				B6AD0E951F2BF8C60091350A /* Team.swift in Sources */,
+				B65330E41F644042001118A8 /* ChallengePaymentViewController.swift in Sources */,
 				B6A561751F116F3B00F1A0C7 /* ProfileSettingsTableViewController.swift in Sources */,
 				B69B0D4E1F3644F200537BEA /* DataPointGraphView.swift in Sources */,
+				B65330E21F643C1E001118A8 /* SignUpChooseChallengeTableViewController.swift in Sources */,
 				B6AD0E971F2E1DB50091350A /* TeamMember.swift in Sources */,
 				B67CC3851F041EF100B69C93 /* ProfileTableViewController.swift in Sources */,
 				B6AD0E911F2BF5320091350A /* PickTeamTableViewController.swift in Sources */,

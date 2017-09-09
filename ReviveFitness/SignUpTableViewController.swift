@@ -6,16 +6,21 @@ import FirebaseAuth
 class SignUpTableViewController: UITableViewController {
     
     var databaseRef: DatabaseReference!
+    var activeUser: ReviveUser?
+    var potentialChallenges: [Challenge] = [Challenge]()
     
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet weak var passwordConfirmTextField: UITextField!
     
     @IBOutlet weak var createAccountButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        attemptLoadChallenges()
     }
     
     override func didReceiveMemoryWarning() {
@@ -47,6 +52,10 @@ class SignUpTableViewController: UITableViewController {
     }
     
     @IBAction func passwordFieldNextButtonPressed() {
+        passwordConfirmTextField.becomeFirstResponder()
+    }
+    
+    @IBAction func passwordConfirmFieldNextButtonPressed() {
         self.view.endEditing(true)
     }
     
@@ -56,14 +65,6 @@ class SignUpTableViewController: UITableViewController {
     
     @IBAction func cancelButtonTapped() {
         dismiss(animated: true, completion: nil)
-    }
-    
-    @IBAction func membershipButtonPressed() {
-        if let url = URL(string: "http://www.revivedellrapids.com") {
-            UIApplication.shared.open(url, options: [:]) {
-                boolean in
-            }
-        }
     }
     
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
@@ -79,6 +80,25 @@ class SignUpTableViewController: UITableViewController {
         }
     }
     
+    func attemptLoadChallenges() {
+        let challengesRef = databaseRef.child("challengeNames")
+        challengesRef.observe(.value, with: { snapshot in
+            if let _ = snapshot.value {
+                self.potentialChallenges = self.loadChallenges(withSnapshot: snapshot)
+            }
+        })
+    }
+    
+    func loadChallenges(withSnapshot snapshot: DataSnapshot) -> [Challenge] {
+        var loadedChallenges = [Challenge]()
+        if let challengesDict = snapshot.value as? [String: String] {
+            for eachChallenge in challengesDict {
+                loadedChallenges.append(Challenge(name: eachChallenge.value, id: eachChallenge.key))
+            }
+        }
+        return loadedChallenges
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -89,14 +109,19 @@ class SignUpTableViewController: UITableViewController {
         if errors.isEmpty {
             Auth.auth().createUser(withEmail: emailTextField.text!, password: passwordTextField.text!) { (user, error) in
                 if error != nil {
-                    self.displayAlert("Error", error!.localizedDescription, [""])
+                    self.displayAlert("Error", error!.localizedDescription, [""], false)
                 } else if user != nil {
                     self.saveNewReviveUser(user!)
-                    self.displayAlert("Success!", "New user with username \(self.emailTextField.text!) created. After you pay for your membership, your account will be activated.", [""])
+                    self.activeUser = ReviveUser(fname: self.firstNameTextField.text!,
+                                                 lname: self.lastNameTextField.text!,
+                                                 id: user!.uid,
+                                                 isAdmin: false)
+                    self.displayAlert("Success!", "New user with username \(self.emailTextField.text!) created. Sign up for a challenge to get started!", [""], true)
+                    self.attemptLoadChallenges()
                 }
             }
         } else {
-            displayAlert("Could not create user", "Please fix the following errors:", errors)
+            self.displayAlert("Could not create new user", "Please fix the following errors:", errors, false)
         }
     }
     
@@ -145,11 +170,14 @@ class SignUpTableViewController: UITableViewController {
         if !lastNameTextField.hasText {
             errors.append("\n- Enter a last name")
         }
+        if passwordConfirmTextField.text != passwordTextField.text {
+            errors.append("\n- Password and confirm password are not identical")
+        }
         
         return errors
     }
     
-    func displayAlert(_ title: String, _ messageHeader: String, _ errors: [String]) {
+    func displayAlert(_ title: String, _ messageHeader: String, _ errors: [String], _ toPayment: Bool) {
         var message = messageHeader
         for eachError in errors {
             message += eachError
@@ -157,8 +185,26 @@ class SignUpTableViewController: UITableViewController {
         let alert = UIAlertController(title: title,
                                       message: message,
                                       preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alert.addAction(action)
-        present(alert, animated: true)
+        if toPayment {
+            let action = UIAlertAction(title: "OK", style: .default, handler: { action in
+                self.performSegue(withIdentifier: "SignUpChooseChallenge", sender: self)
+            })
+            alert.addAction(action)
+            present(alert, animated: true)
+        } else {
+            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alert.addAction(action)
+            present(alert, animated: true)
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "SignUpChooseChallenge" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! SignUpChooseChallengeTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.activeUser
+            controller.challengeChoices = self.potentialChallenges
+        }
     }
 }

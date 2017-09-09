@@ -27,7 +27,7 @@ class ReviveUser: NSObject {
     // Challenge this user is currently operating in
     var activeChallenge: Challenge?
     
-    init(fname: String, lname: String, email: String, id: String, isAdmin: Bool) {
+    init(fname: String, lname: String, id: String, isAdmin: Bool) {
         self.firstName = fname
         self.lastName = lname
         self.id = id

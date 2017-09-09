@@ -6,6 +6,7 @@ class ChooseChallengeTableViewController: UITableViewController {
     
     var databaseRef: DatabaseReference!
     var challengeChoices = [Challenge]()
+    var allChallenges = [Challenge]()
     var activeUser: ReviveUser?
     
     override func viewDidLoad() {
@@ -17,31 +18,60 @@ class ChooseChallengeTableViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        if challengeChoices.count == 0 {
+            return 1
+        } else {
+            return 2
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if challengeChoices.count > 0 && section == 0 {
+            return "Your challenges"
+        } else {
+            return ""
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return challengeChoices.count
+        if challengeChoices.count == 0 {
+            return 1
+        } else {
+            if section == 0 {
+                return challengeChoices.count
+            } else {
+                return 1
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ChallengeCell")!
-        if indexPath.row < challengeChoices.count {
+        if challengeChoices.count == 0 || indexPath.section == 1 {
+            cell.textLabel?.text = ""
+            cell.detailTextLabel?.text = "Join new challenge"
+        } else if indexPath.row < challengeChoices.count {
             let cellChallenge = challengeChoices[indexPath.row]
             cell.textLabel?.text = cellChallenge.name
+            cell.detailTextLabel?.text = ""
         }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row < challengeChoices.count {
+        if challengeChoices.count > 0 &&
+            indexPath.row < challengeChoices.count &&
+            indexPath.section == 0 {
+            
             let chosenChallenge = challengeChoices[indexPath.row]
             if let user = activeUser {
                 user.activeChallenge = chosenChallenge
                 setUserData(of: user, forChallenge: chosenChallenge)
             }
             activeUser?.activeChallenge = chosenChallenge
-            
+        } else if (indexPath.section == 1 && indexPath.row == 0) ||
+            (challengeChoices.count == 0 && indexPath.section == 0 && indexPath.row == 0){
+            performSegue(withIdentifier: "SignUpChooseChallenge", sender: self)
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -75,7 +105,26 @@ class ChooseChallengeTableViewController: UITableViewController {
             controller.databaseRef = self.databaseRef
             controller.activeUser = self.activeUser
             controller.firstTimeSettings = true
+        } else if segue.identifier == "SignUpChooseChallenge" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! SignUpChooseChallengeTableViewController
+            controller.databaseRef = self.databaseRef
+            controller.activeUser = self.activeUser
+            let filteredChallenges = filterChallenges()
+            controller.challengeChoices = filteredChallenges
         }
+    }
+    
+    func filterChallenges() -> [Challenge] {
+        var filteredChallenges = [Challenge]()
+        
+        for eachChallenge in allChallenges {
+            if !challengeChoices.contains(eachChallenge) {
+                filteredChallenges.append(eachChallenge)
+            }
+        }
+        
+        return filteredChallenges
     }
     
 }
