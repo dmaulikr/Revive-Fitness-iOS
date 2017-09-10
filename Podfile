@@ -10,7 +10,6 @@ target 'ReviveFitness' do
   pod 'Firebase/Database'
   pod 'Firebase/Auth'
   
-  # Includes Cards and PayPal payment systems
-  pod 'Braintree'
+  # Includes credit card payment systems
   pod 'BraintreeDropIn'
 end

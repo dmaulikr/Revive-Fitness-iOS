@@ -9,6 +9,9 @@ class SignUpChooseChallengeTableViewController: UITableViewController {
     var activeUser: ReviveUser?
     var chosenChallenge: Challenge?
     
+    var allChallenges: [Challenge]?
+    var usersChallenges: [Challenge]?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -57,6 +60,8 @@ class SignUpChooseChallengeTableViewController: UITableViewController {
                 controller.databaseRef = self.databaseRef
                 controller.activeUser = self.activeUser
                 controller.challenge = self.chosenChallenge!
+                controller.challengeChoices = self.usersChallenges
+                controller.allChallenges = self.allChallenges
             }
         }
     }

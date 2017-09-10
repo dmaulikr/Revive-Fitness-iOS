@@ -112,6 +112,8 @@ class ChooseChallengeTableViewController: UITableViewController {
             controller.activeUser = self.activeUser
             let filteredChallenges = filterChallenges()
             controller.challengeChoices = filteredChallenges
+            controller.allChallenges = self.allChallenges
+            controller.usersChallenges = self.challengeChoices
         }
     }
     

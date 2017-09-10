@@ -1,4 +1,18 @@
 PODS:
+  - Braintree/Card (4.8.3):
+    - Braintree/Core
+  - Braintree/Core (4.8.3)
+  - Braintree/UnionPay (4.8.3):
+    - Braintree/Card
+    - Braintree/Core
+  - BraintreeDropIn (5.2.0):
+    - BraintreeDropIn/DropIn (= 5.2.0)
+  - BraintreeDropIn/DropIn (5.2.0):
+    - Braintree/Card (~> 4.0)
+    - Braintree/Core (~> 4.0)
+    - Braintree/UnionPay (~> 4.0)
+    - BraintreeDropIn/UIKit
+  - BraintreeDropIn/UIKit (5.2.0)
   - Firebase/Auth (4.0.2):
     - Firebase/Core
     - FirebaseAuth (= 4.0.0)
@@ -35,11 +49,14 @@ PODS:
   - GTMSessionFetcher/Core (1.1.10)
 
 DEPENDENCIES:
+  - BraintreeDropIn
   - Firebase/Auth
   - Firebase/Core
   - Firebase/Database
 
 SPEC CHECKSUMS:
+  Braintree: e91ccdfb26365d342ee4c42d668aa3cb57a6fb18
+  BraintreeDropIn: f4278c4eafc1395d06ce79652fa1658d2b5ab815
   Firebase: c7ad0731eab26d18a3fc547dd048b0f7cd9c63ae
   FirebaseAnalytics: 4d7040fefc3cd8b291cde35f12cf063d7963f15d
   FirebaseAuth: ebb6abcbabae00fc47446d690c19ce68d8484fde
@@ -49,6 +66,6 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
   GTMSessionFetcher: 30d874b96d0d76028f61fbd122801e3f030d47db
 
-PODFILE CHECKSUM: bb9a0a1d221168d53e47847b3005569a95d1f5b7
+PODFILE CHECKSUM: 199894063cca0dc34e51483fcb785f8a383a448f
 
-COCOAPODS: 1.2.1
+COCOAPODS: 1.3.1
